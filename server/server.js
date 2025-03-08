@@ -6,6 +6,8 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 
+import authRoutes from "./routes/authRoutes.js"
+
 import { redisClient } from "./config/redis.js";
 import passport from "passport";
 
@@ -30,14 +32,22 @@ server.use(
 server.use(passport.initialize());
 server.use(passport.session());
 
-redisClient.connect().catch(console.error);
+const connectRedis = async () => {
+  try {
+    await redisClient.connect();
+  } catch (error) {
+    console.error("Failed to connect to Redis:", error);
+  }
+};
+
+connectRedis();
 
 server.get("/", (req, res) => res.send("Server running"));
 
 server.use("/auth", authRoutes);
-server.use("/chat", chatRoutes);
-server.use("/ai", aiRoutes);
+// server.use("/chat", chatRoutes);
+// server.use("/ai", aiRoutes);
 
 server.listen(process.env.PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${process.env.PORT}`);
 });
