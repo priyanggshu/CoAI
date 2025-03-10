@@ -1,1 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Krona+One&family=Syne:wght@400..800&display=swap');
 @import "tailwindcss";
+
+.font-dancing {
+    font-family: 'Dancing Script', cursive;
+}
+
+.font-Syne {
+    font-family: 'Syne';
+}
+
+.font-Krona {
+    font-family: 'Krona One';
+}
