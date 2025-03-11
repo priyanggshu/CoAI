@@ -1,32 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { loginSuccess } from "../redux/slices/authSlice";
+import { loginSuccess, signInWithGoogle } from "../redux/slices/authSlice";
 import { useNavigate } from "react-router-dom";
 import {
-  FiSearch,
   FiCommand,
-  FiActivity,
-  FiAward,
   FiLock,
   FiUsers,
   FiVideo,
   FiArrowRight,
   FiZap,
-  FiStar,
   FiLogIn,
-  FiMessageSquare,
-  
+  FiCode,
 } from "react-icons/fi";
-import { FaBolt } from "react-icons/fa6";
+import { FaBolt, FaXTwitter } from "react-icons/fa6";
 import { TiGroup } from "react-icons/ti";
-import { AiFillOpenAI } from "react-icons/ai";
+import { AiFillOpenAI, AiFillRobot } from "react-icons/ai";
 import { SiHuggingface, SiWebrtc } from "react-icons/si";
+import { FaRegLightbulb, FaGithub, FaLinkedin } from "react-icons/fa";
+
 import { RiGeminiFill, RiClaudeLine, RiPerplexityLine } from "react-icons/ri";
-
-
 
 const LandingPage = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
@@ -47,18 +43,10 @@ const LandingPage = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      // Here you would integrate with Google Auth
-      // For demonstration, we'll simulate a successful login
-      const mockUser = {
-        id: "12345",
-        name: "Demo User",
-        email: "demo@example.com",
-        picture: "https://via.placeholder.com/150",
-      };
-      dispatch(loginSuccess(mockUser));
-      navigate("/dashboard");
+      await dispatch(signInWithGoogle());
+      navigate("/login");
     } catch (error) {
-      console.error("Authentication error:", error);
+      console.error("Google Sign-in failed:", error);
     }
   };
 
@@ -117,8 +105,8 @@ const LandingPage = () => {
           <div>
             <div className="">
               <button
-                onClick={handleGoogleSignIn}
-                className="flex items-center gap-3 px-5 py-2 font-Syne bg-white text-black rounded-xl hover:bg-[#2D1A57] hover:text-[#D9DBE3] hover:translate-x-1 transition shadow-md"
+                onClick={() => setAuthDialogOpen(true)}
+                className="flex items-center gap-3 px-5 py-2 font-Syne font-semibold bg-white text-black rounded-xl hover:bg-[#2D1A57] hover:text-[#D9DBE3] hover:translate-x-1 transition shadow-md"
               >
                 Dive In
                 <FiLogIn className="scale-110 hover:translate-x-0.5" />
@@ -139,7 +127,7 @@ const LandingPage = () => {
             The Future of AI Collaboration
             <span className="animate-pulse ml-2">✨</span>
           </div>
-          <h1 className="text-5xl font-Krona md:text-6xl font-bold mt-8 mb-8 bg-gradient-to-r from-black via-indigo-400 to-black bg-clip-text text-transparent leading-tight">
+          <h1 className="text-5xl font-Krona md:text-6xl font-bold mt-8 mb-8 bg-gradient-to-r from-black/30 md:from-black via-indigo-400 md:to-black to-black/30 bg-clip-text text-transparent leading-tight">
             Unleash the Power of
             <br />
             <span className="bg-gradient-to-r from-gray-200/60 via-yellow-500/80 to-gray-200/60 bg-clip-text text-transparent leading-tight">
@@ -153,19 +141,19 @@ const LandingPage = () => {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-6 mt-20">
             <button
-              onClick={handleGoogleSignIn}
+              onClick={() => setAuthDialogOpen(true)}
               className="group px-8 py-4 font-Syne bg-gradient-to-r from-indigo-600 to-indigo-800 text-white rounded-2xl hover:from-indigo-900 hover:to-indigo-500 transition-all duration-300 shadow-lg shadow-indigo-500/20 text-lg flex items-center justify-center gap-3"
             >
               Launch Now
               <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
             </button>
-            <a
-              href="#demo"
+            <button
+              onClick={() => setAuthDialogOpen(true)}
               className="group px-8 py-4 bg-white/5 backdrop-blur-md text-indigo-400 border border-indigo-500/30 rounded-2xl hover:bg-white/10 transition-all duration-300 shadow-md text-lg flex items-center justify-center gap-3 hover:border-indigo-500/80"
             >
               Add Collaborators
               <FiVideo className="group-hover:scale-110 transition-transform" />
-            </a>
+            </button>
           </div>
         </div>
       </section>
@@ -189,10 +177,23 @@ const LandingPage = () => {
               { name: "ChatGPT", icon: AiFillOpenAI, colour: "text-white" },
               { name: "Gemini", icon: RiGeminiFill, colour: "text-blue-500" },
               { name: "Claude", icon: RiClaudeLine, colour: "text-orange-500" },
-              { name: "Perplexity", icon: RiPerplexityLine, colour: "text-gray-200" },
+              {
+                name: "Perplexity",
+                icon: RiPerplexityLine,
+                colour: "text-gray-200",
+              },
               { name: "Bolt.new", icon: FaBolt, colour: "text-gray-400" },
-              { name: "Hugging Face", icon: SiHuggingface, colour: "text-yellow-400" },
-              { name: "WebRTC Collaboration", icon: SiWebrtc, colour: "text-green-300", highlight: true },
+              {
+                name: "Hugging Face",
+                icon: SiHuggingface,
+                colour: "text-yellow-400",
+              },
+              {
+                name: "WebRTC Collaboration",
+                icon: SiWebrtc,
+                colour: "text-green-300",
+                highlight: true,
+              },
             ].map((service) => (
               <div key={service.name} className="group cursor-pointer">
                 <div
@@ -266,13 +267,13 @@ const LandingPage = () => {
 
       {/* Features Section */}
       <section className="py-24 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/60"></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-20">
             <h2 className="font-Syne text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-indigo-300 to-indigo-500 bg-clip-text text-transparent">
               Everything You Need in One Place
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            <p className="font-Syne text-lg text-gray-300 max-w-2xl mt-8 mx-auto">
               A complete AI collaboration platform built for modern teams
             </p>
           </div>
@@ -284,21 +285,21 @@ const LandingPage = () => {
                 title: "Smart AI Orchestration",
                 description:
                   "Get the best answers by querying multiple AI models simultaneously. Our smart routing ensures you always get the optimal response.",
-                color: "indigo",
+                color: "text-gray-600",
               },
               {
                 icon: FiUsers,
                 title: "Real-time Collaboration",
                 description:
                   "Work together seamlessly with your team. Share prompts, compare responses, and iterate together in real-time.",
-                color: "purple",
+                color: "text-purple-600",
               },
               {
                 icon: FiLock,
                 title: "Enterprise Security",
                 description:
                   "Bank-grade encryption, SOC 2 compliance, and granular access controls keep your data and conversations secure.",
-                color: "blue",
+                color: "text-blue-600",
               },
             ].map((feature, index) => (
               <div
@@ -311,230 +312,203 @@ const LandingPage = () => {
                     className={`w-16 h-16 bg-${feature.color}-900/50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}
                   >
                     {React.createElement(feature.icon, {
-                      className: `text-3xl text-${feature.color}-400`,
+                      className: `text-3xl ${feature.color}`,
                     })}
                   </div>
-                  <h3 className="text-2xl font-semibold text-white mb-4">
+                  <h3 className="font-Krona text-xl font-semibold text-white/90 mb-4">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-400 leading-relaxed">
+                  <p className="font-Syne text-gray-400 leading-relaxed">
                     {feature.description}
                   </p>
                 </div>
               </div>
             ))}
           </div>
+
+          {/* How it Works */}
+          <section id="how-it-works" className="py-16 md:pb-16 px-4">
+            <div className="container mx-auto">
+              <h2 className="text-3xl md:text-4xl font-Krona font-bold text-center text-slate-300 mb-16">
+                How <span className="font-dancing text-indigo-600">CoAI</span>{" "}
+                Works
+              </h2>
+
+              <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="font-dancing text-4xl font-extrabold text-indigo-600">
+                      1
+                    </span>
+                  </div>
+                  <h3 className="font-Syne text-2xl font-semibold text-slate-100 mb-3">
+                    Sign In
+                  </h3>
+                  <p className="font-Syne text-slate-400">
+                    Use Google authentication to quickly access your
+                    collaborative workspace.
+                  </p>
+                </div>
+
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="font-dancing text-4xl font-extrabold text-indigo-600">
+                      2
+                    </span>
+                  </div>
+                  <h3 className="font-Syne text-2xl font-semibold text-slate-100 mb-3">
+                    Create or Join
+                  </h3>
+                  <p className="font-Syne text-slate-400">
+                    Start a new project or join an existing collaborative AI
+                    workspace.
+                  </p>
+                </div>
+
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="font-dancing text-4xl font-extrabold text-indigo-600">
+                      3
+                    </span>
+                  </div>
+                  <h3 className="font-Syne text-2xl font-semibold text-slate-100 mb-3">
+                    Collaborate
+                  </h3>
+                  <p className="font-Syne text-slate-400">
+                    Search across AI services, communicate via WebRTC, and work
+                    together in real-time.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
       </section>
 
-      {/* Social Proof Section */}
-      <section className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/80"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-indigo-300 to-indigo-500 bg-clip-text text-transparent">
-              Loved by Teams Worldwide
-            </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Join thousands of developers and teams who've transformed their AI
-              workflow
-            </p>
-          </div>
+      {/* Why CoAI Section */}
+      <section className=" bg-gradient-to-b from-black/60 to-black/60 pb-12 relative">
+        <div className="container mx-auto px-6 relative z-10 text-center">
+          <h2 className="font-Syne text-4xl md:text-5xl font-bold bg-gradient-to-r from-transparent via-indigo-200 to-transparent bg-clip-text text-transparent mb-6">
+            Why Choose CoAI?
+          </h2>
+          <p className="font-Syne text-lg text-gray-500 max-w-3xl mx-auto mb-12">
+            A seamless AI experience that integrates top models, real-time
+            collaboration, and cutting-edge tools—built for teams, developers,
+            and AI enthusiasts.
+          </p>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                quote:
-                  "CoAI has completely transformed how our team interacts with AI. The ability to compare responses from different models is game-changing.",
-                author: "Sarah Chen",
-                role: "Lead Developer at TechCorp",
+                title: "Multi-AI Access",
+                description:
+                  "Compare and utilize AI models like ChatGPT, Gemini, Claude, and more—all in one platform.",
+                icon: AiFillRobot,
               },
               {
-                quote:
-                  "The collaboration features are incredible. We can now work together on AI prompts in real-time, which has dramatically improved our workflow.",
-                author: "Michael Rodriguez",
-                role: "Product Manager at StartupX",
+                title: "Real-Time Collaboration",
+                description:
+                  "Enhance productivity with WebRTC-powered voice, video, and chat collaboration on AI tasks.",
+                icon: SiWebrtc,
               },
               {
-                quote:
-                  "Finally, a solution that brings together all our favorite AI models in one place. The time savings are incredible.",
-                author: "Emily Thompson",
-                role: "AI Researcher at DataLabs",
+                title: "Smart Query Optimization",
+                description:
+                  "Let CoAI optimize your queries for faster, more relevant responses across different AI models.",
+                icon: FiZap,
               },
-            ].map((testimonial, index) => (
+              {
+                title: "Custom AI Workspaces",
+                description:
+                  "Save your favorite AI interactions, collaborate on prompts, and tailor your AI experience.",
+                icon: FaRegLightbulb,
+              },
+              {
+                title: "Seamless Authentication",
+                description:
+                  "Secure login with Google OAuth, ensuring a hassle-free onboarding process.",
+                icon: FiLogIn,
+              },
+              {
+                title: "Built for Collaborators & Teams",
+                description:
+                  "A sleek UI, API integrations, and productivity tools for AI-driven development workflows.",
+                icon: FiCode,
+              },
+            ].map((feature, index) => (
               <div
                 key={index}
-                className="bg-black/30 backdrop-blur-sm p-8 rounded-2xl border border-gray-800/50 hover:border-indigo-500/30 transition-all duration-300"
+                className="bg-black/40 backdrop-blur-md p-6 rounded-2xl border border-gray-800/50 hover:border-indigo-500/50 transition-all duration-300 hover:bg-black/50 hover:scale-105 flex flex-col items-center text-center"
               >
-                <div className="mb-6">
-                  {[...Array(5)].map((_, i) => (
-                    <FiStar
-                      key={i}
-                      className="inline-block text-yellow-400 mr-1"
-                    />
-                  ))}
-                </div>
-                <p className="text-gray-300 mb-6 italic">
-                  "{testimonial.quote}"
+                {React.createElement(feature.icon, {
+                  className: "h-12 w-12 text-indigo-400 mb-4",
+                })}
+                <h3 className="font-Krona text-lg font-semibold text-white mb-3">
+                  {feature.title}
+                </h3>
+                <p className="font-Syne text-gray-400 text-sm">
+                  {feature.description}
                 </p>
-                <div>
-                  <p className="text-white font-semibold">
-                    {testimonial.author}
-                  </p>
-                  <p className="text-gray-400 text-sm">{testimonial.role}</p>
-                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/80 to-purple-900/80"></div>
-        <div className="absolute inset-0 bg-black/50"></div>
-        <div className="container mx-auto px-4 relative z-10 text-center">
-          <h2 className="text-4xl md:text-6xl font-bold mb-8 text-white">
-            Ready to Transform Your
-            <br />
-            AI Experience?
+      {/* Socials Section */}
+      <section className="py-24 bg-gradient-to-b from-black/70 to-blue-800/5 backdrop-blur-[2px] relative">
+        <div className="container mx-auto px-6 relative z-10 text-center">
+          <h2 className="font-dancing font-bold text-3xl md:text-6xl bg-gradient-to-r from-black/90 to-white bg-clip-text text-transparent mb-6">
+            Connect With Ps.
           </h2>
-          <p className="text-xl text-indigo-200 max-w-2xl mx-auto mb-12">
-            Join thousands of developers who are already leveraging the power of
-            unified AI. Start your free trial today.
+          <p className="font-Krona text-sm text-gray-300 max-w-3xl mx-auto mb-12">
+            Stay updated, join the conversation, and be part of the CoAI
+            community.
           </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <button
-              onClick={handleGoogleSignIn}
-              className="group px-8 py-4 bg-white text-indigo-900 rounded-2xl hover:bg-indigo-100 transition-all duration-300 shadow-lg text-lg font-medium flex items-center gap-3"
-            >
-              Get Started Free
-              <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
-            </button>
-            <p className="text-indigo-200">No credit card required</p>
+
+          <div className="flex flex-wrap justify-center gap-6">
+            {[
+              {
+                name: "LinkedIn",
+                icon: FaLinkedin,
+                link: "https://linkedin.com/company/CoAI",
+                colour: "text-blue-700",
+              },
+              {
+                name: "Twitter",
+                icon: FaXTwitter,
+                link: "https://twitter.com/CoAI",
+                colour: "text-white",
+              },
+              {
+                name: "GitHub",
+                icon: FaGithub,
+                link: "https://github.com/CoAI",
+                colour: "text-gray-600",
+              },
+            ].map((social, index) => (
+              <a
+                key={index}
+                href={social.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-3 px-4 py-4 bg-black/30 border border-gray-700/50 hover:border-indigo-500/50 rounded-full transition-all duration-300 hover:bg-black/40 hover:scale-105"
+              >
+                {React.createElement(social.icon, {
+                  className: `h-8 w-8 ${social.colour} group-hover:text-indigo-300`,
+                })}
+              </a>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 bg-black/80 backdrop-blur-sm text-gray-400 border-t border-gray-800/50">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-12">
-            <div>
-              <h3 className="text-2xl font-bold text-white mb-4">
-                Co<span className="text-indigo-400">AI</span>
-              </h3>
-              <p className="text-gray-400">
-                Unifying the world's AI services into one powerful platform.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold text-white mb-4">Product</h4>
-              <ul className="space-y-2">
-                <li>
-                  <a
-                    href="#features"
-                    className="hover:text-indigo-400 transition-colors"
-                  >
-                    Features
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#pricing"
-                    className="hover:text-indigo-400 transition-colors"
-                  >
-                    Pricing
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#security"
-                    className="hover:text-indigo-400 transition-colors"
-                  >
-                    Security
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#enterprise"
-                    className="hover:text-indigo-400 transition-colors"
-                  >
-                    Enterprise
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold text-white mb-4">Company</h4>
-              <ul className="space-y-2">
-                <li>
-                  <a
-                    href="#about"
-                    className="hover:text-indigo-400 transition-colors"
-                  >
-                    About
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#blog"
-                    className="hover:text-indigo-400 transition-colors"
-                  >
-                    Blog
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#careers"
-                    className="hover:text-indigo-400 transition-colors"
-                  >
-                    Careers
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#contact"
-                    className="hover:text-indigo-400 transition-colors"
-                  >
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold text-white mb-4">Legal</h4>
-              <ul className="space-y-2">
-                <li>
-                  <a
-                    href="#privacy"
-                    className="hover:text-indigo-400 transition-colors"
-                  >
-                    Privacy
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#terms"
-                    className="hover:text-indigo-400 transition-colors"
-                  >
-                    Terms
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#security"
-                    className="hover:text-indigo-400 transition-colors"
-                  >
-                    Security
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800/50 mt-12 pt-8 text-center">
-            <p>&copy; {new Date().getFullYear()} CoAI. All rights reserved.</p>
-          </div>
+      {/* Footer Section */}
+      <footer className="py-10 bg-black/60 backdrop-blur-[1px] border-t border-gray-900">
+        <div className="container mx-auto px-6 text-center">
+          <p className="font-Krona text-gray-400 text-xs">
+            © {new Date().getFullYear()} CoAI. All rights reserved.
+          </p>
         </div>
       </footer>
     </div>

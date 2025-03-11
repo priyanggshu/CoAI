@@ -33,15 +33,15 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
+    <div className="min-h-screen bg-[url('./assets/landing.png')] flex flex-col md:flex-row">
       {/* Left Side - Illustration */}
-      <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-indigo-600 to-purple-700 p-12 flex-col justify-between">
+      <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-transparent to-purple-700/20 p-12 flex-col justify-between">
         <div>
-          <h1 className="text-white text-3xl font-bold">Co<span className="text-teal-300">AI</span></h1>
+          <h1 className="font-dancing text-white text-4xl font-bold">CoAI</h1>
         </div>
         
         <div className="max-w-md">
-          <h2 className="text-white text-4xl font-bold mb-6">Collaborate with AI in a whole new way</h2>
+          <h2 className="font-Syne text-gray-300 text-4xl font-bold mb-6">Collaborate with AI in a whole new way</h2>
           <p className="text-indigo-100 text-lg mb-8">
             Join teams using CoAI to search multiple AI services at once and collaborate in real-time with WebRTC.
           </p>
@@ -76,7 +76,7 @@ const LoginPage = () => {
       </div>
       
       {/* Right Side - Login Form */}
-      <div className="flex-1 flex flex-col justify-center items-center p-8 bg-slate-50">
+      <div className="flex-1 flex flex-col justify-center items-center p-8 ">
         <div className="w-full max-w-md">
           <div className="md:hidden text-center mb-10">
             <h1 className="text-indigo-600 text-3xl font-bold">Co<span className="text-teal-500">AI</span></h1>
