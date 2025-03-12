@@ -14,18 +14,25 @@ model User {
   name            String?
   picture         String?
   apiKeys         Json?
+  authTokens      Json?
   preferences     Json?
   conversations   Conversation[]
   createdAt       DateTime   @default(now())
-  updatedAt  DateTime        @updatedAt
+  updatedAt       DateTime   @updatedAt
 }
 
 model AIService {
   id              String    @id   @default(uuid())
   name            String    @unique
   apiUrl          String
-  status          String
+  oauthType       String?
+  status          Status    @default(ACTIVE)
   conversations   Conversation[]
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
 }
 
 model Conversation {
