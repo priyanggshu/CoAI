@@ -1,6 +1,16 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { redisClient } from "../config/redis.js";
 import axios from "axios";
+import {
+  queryOpenAI,
+  queryGemini,
+  queryPerplexity,
+  queryBolt,
+  queryDeepseek,
+  queryClaude,
+  queryGrok,
+  queryHuggingFace,
+} from "../services/ai_Services.js";
 
 const prisma = new PrismaClient();
 
@@ -18,64 +28,33 @@ export const AIResponseController = async (req, res) => {
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    const apiKeys = user.apiKeys || {};
-    const aiServices = await prisma.aIService.findMany({
-      where: { status: "active" },
-    });
+    let responses = await Promise.all([
+      aiServicePreference === "OpenAI" || !aiServicePreference ? queryOpenAI(message) : null,
+      aiServicePreference === "Gemini" || !aiServicePreference ? queryGemini(message) : null,
+      aiServicePreference === "Perplexity" || !aiServicePreference ? queryPerplexity(message) : null,
+      aiServicePreference === "Deepseek" || !aiServicePreference ? queryDeepseek(message) : null,
+      aiServicePreference === "Bolt" || !aiServicePreference ? queryBolt(message) : null,
+      aiServicePreference === "Claude" || !aiServicePreference ? queryClaude(message) : null,
+      aiServicePreference === "Grok" || !aiServicePreference ? queryGrok(message) : null,
+      aiServicePreference === "HuggingFace" || !aiServicePreference ? queryHuggingFace(message) : null,
+    ]);
 
-    if (!aiServices.length)
-      return res.status(500).json({ error: "No AI services available" });
-    let selectedAI =
-      aiServices.find((service) => service.name === aiServicePreference) ||
-      aiServices[0];
-    let response;
-
-    try {
-      response = await axios.post(
-        selectedAI.apiUrl,
-        { prompt: message },
-        {
-          headers: { Authorization: `Bearer ${apiKeys[selectedAI.name]}` },
-        }
-      );
-    } catch (error) {
-      console.error(`Error with ${selectedAI.name}:`, error.message);
-
-      for (let fallbackAI of aiServices) {
-        if (fallbackAI.id !== selectedAI.id) {
-          try {
-            response = await axios.post(
-              fallbackAI.apiUrl,
-              { prompt: message },
-              {
-                headers: {
-                  Authorization: `Bearer ${apiKeys[fallbackAI.name]}`,
-                },
-              }
-            );
-            selectedAI = fallbackAI;
-            break;
-          } catch (err) {
-            console.error(
-              `Error with fallback ${fallbackAI.name}:`,
-              err.message
-            );
-          }
-        }
-      }
+    const mergedResponse = mergeResponses(responses);
+    if (!mergedResponse) {
+      return res.status(500).json({ error: "All AI services failed." });
     }
 
-    if (!response)
-      return res.status(500).json({ error: "All AI services failed" });
+    await redisClient.set(cacheKey, JSON.stringify(mergedResponse), "EX", 600);
+
     await prisma.conversation.create({
       data: {
         userId,
-        aiService: selectedAI.name,
-        messages: { request: message, response: response.data },
+        aiService: aiServicePreference || "Multiple",
+        messages: { request: message, response: mergeResponses },
       },
     });
 
-    res.json({ response: response.data });
+    res.json({ response: mergedResponse });
   } catch (error) {
     console.error("Query AI error:", error);
     res.status(500).json({ error: "Internal Server error" });

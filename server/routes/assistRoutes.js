@@ -1,9 +1,9 @@
 import express from "express";
 import multer from "multer";
-import { synthesizeSpeech, transcribeAudio } from "../controllers/voice_Controller.js";
-import { checkLimitsController } from "../controllers/limit_Controller.js";
-import { fetchAndMergeResponses } from "../controllers/multiAI_Controller.js";
-import { getRecommendationsController, saveUserQueryController } from "../controllers/suggest_Controller.js";
+import { synthesizeSpeech, transcribeAudio } from "../controllers/assist_Controller.js";
+import { checkLimitsController } from "../controllers/assist_Controller.js";
+import { fetchAndMergeResponses } from "../controllers/assist_Controller.js";
+import { getRecommendationsController, saveUserQueryController } from "../controllers/assist_Controller.js";
 
 const router = express.Router();
 
@@ -31,14 +31,14 @@ router.post("/text-to-speech", async (req, res) => {
     catch (error) { res.status(500).json({ error: "Text-to-speech processing failed", details: error.message }); }
 });
 
-// Multi-AI Query Merging
+// AI service's limit checking
 router.get("/check-limits", checkLimitsController);
 
 // AI-Based Recommendations
 router.get('/', getRecommendationsController);
 router.post('/save-query', saveUserQueryController);
 
-// smart AI aggregator
+// smart AI aggregator/ merger
 router.post("/fusion", async (req, res) => {
   try { 
     const response = await fetchAndMergeResponses(req.body); 
