@@ -1,4 +1,4 @@
-import OAuth from "../components/OAuth";
+import OAuth from "./OAuth";
 import { FiVideo, FiArrowRight } from "react-icons/fi";
 
 const Home = ({ setAuthDialogOpen, authDialogOpen }) => {

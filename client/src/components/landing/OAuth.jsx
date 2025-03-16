@@ -1,6 +1,6 @@
 import { FcGoogle } from "react-icons/fc";
 import { useDispatch } from "react-redux";
-import { signInWithGoogle } from "../redux/slices/authSlice";
+import { signInWithGoogle } from "../../redux/slices/authSlice";
 
 const OAuth = ({ authDialogOpen, setAuthDialogOpen }) => {
   const dispatch = useDispatch();
@@ -31,7 +31,7 @@ const OAuth = ({ authDialogOpen, setAuthDialogOpen }) => {
               <h2 className="font-dancing text-white font-extrabold text-4xl">
                 CoAI
               </h2>
-              <p className="font-Syne text-md mt-1 font-semibold bg-gradient-to-r from-blue-100 via-gray-900 to-blue-100 bg-clip-text text-transparent">
+              <p className="font-Syne text-md mt-1 font-semibold bg-gradient-to-r from-blue-100 to-blue-100 bg-clip-text text-transparent">
                 Your collaborative AI workspace.
               </p>
             </div>

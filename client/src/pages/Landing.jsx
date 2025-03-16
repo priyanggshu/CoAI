@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { signInWithGoogle } from "../redux/slices/authSlice";
 
-import Overview from "../components/Overview";
-import Features from "../components/Features";
-import Purpose from "../components/Purpose";
-import Socials from "../components/Socials";
-import Home from "../components/Home";
-import Navbar from "../components/Navbar";
+import Overview from "../components/landing/Overview";
+import Features from "../components/landing/Features";
+import Purpose from "../components/landing/Purpose";
+import Socials from "../components/landing/Socials";
+import Home from "../components/landing/Home";
+import Navbar from "../components/landing/Navbar";
 
 const LandingPage = () => {
   const [isScrolled, setIsScrolled] = useState(false);
