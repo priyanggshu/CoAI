@@ -18,13 +18,14 @@ const Navbar = ({ activePage, setActivePage }) => {
   const [activeNav, setActiveNav] = useState("home");
 
   return (
-    <nav className="w-full bg-black/30 backdrop-blur-md shadow-lg py-4 z-30">
-      <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
+    <nav className="bg-[#D3D2D3] backdrop-blur-md py-3 z-30">
+      <div className="px-4 md:px-8 flex justify-between items-center">
+      <div className="flex items-center justify-start gap-12">
         {/* Logo */}
-        <span className="text-white text-3xl font-dancing font-bold tracking-wider">CoAI</span>
+        <span className="text-3xl font-dancing font-extrabold tracking-wider">CoAI</span>
 
         {/* Nav Links */}
-        <div className="hidden md:flex items-center space-x-8 font-Syne text-white">
+        <div className="hidden md:flex items-center space-x-2 font-Syne py-1">
           {navItems.map(({ id, label, icon: Icon, activeIcon: ActiveIcon }) => {
             const isActive = (activeNav === id) && (activePage === id);
             const IconComponent = isActive && ActiveIcon ? ActiveIcon : Icon;
@@ -35,31 +36,28 @@ const Navbar = ({ activePage, setActivePage }) => {
                   setActiveNav(id)
                   setActivePage(id)
                 }}
-                className={`flex items-center space-x-2 px-3 py-1 rounded-md transition-all duration-200 ${
+                className={`flex flex-col justify-center items-center px-6 py-[.4rem] rounded-xl cursor-pointer hover:text-zinc-700 hover:bg-[#909191]/10 transition-all duration-200 ${
                   isActive
-                    ? "bg-white/20 text-white shadow-sm"
-                    : "text-white/70 hover:bg-white/10 hover:text-white"
+                    ? "bg-[#909191]/15 border-b border-zinc-400 text-gray-800 shadow-2xl"
+                    : ""
                 }`}
               >
-                <IconComponent size={22} className="transition-transform duration-300" />
-                <span className="text-sm font-medium">{label}</span>
+                <span className="font-medium">{label}</span>
               </button>
             );
           })}
         </div>
+        </div>
 
         {/* User Profile Section */}
-        <div className="flex items-center space-x-3 text-white font-Syne cursor-pointer hover:text-white/80 transition-all duration-200">
+        <div className="flex items-center space-x-3 cursor-pointer border-r border-gray-500 hover:scale-105 px-1 rounded-3xl transition-all duration-200">
           <img
             src="https://i.pravatar.cc/40"
             alt="User Avatar"
-            className="w-10 h-10 rounded-full object-cover border border-white/30"
+            className="size-11 rounded-full object-cover border border-stone-600/40"
           />
-          <div className="hidden md:flex flex-col text-sm leading-tight">
-            <span className="font-semibold">John Doe</span>
-            <span className="text-xs text-white/60">john.doe@example.com</span>
-          </div>
-          <FaChevronDown size={12} className="ml-1 text-white/70" />
+
+          <FaChevronDown size={12} className=" hover:text-blue-700  ml-1" />
         </div>
       </div>
     </nav>

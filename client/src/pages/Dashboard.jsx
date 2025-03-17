@@ -8,10 +8,10 @@ const [activePage, setActivePage] = useState("home");
 const [currentSection, setCurrentSection] = useState("home");
 
   return (
-    <div className="relative min-h-screen bg-[url('./assets/landing.png')] bg-cover bg-no-repeat bg-center ">
+    <div className="relative min-h-screen bg-[#D3D2D3]  bg-cover bg-no-repeat bg-center ">
       <Navbar activePage={activePage} setActivePage={setActivePage} />
       <DashBody activePage={activePage} />
-      <Utilitybar section={currentSection} />
+      {/* <Utilitybar section={currentSection} /> */}
     </div>
   )
 }
