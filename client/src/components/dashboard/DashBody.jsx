@@ -7,7 +7,7 @@ import HistoryPage from "./subparts/HistoryPage";
 
 const DashBody = ({ activePage }) => {
   return (
-    <section className="bg-[#D3D2D3] h-[90vh] rounded-4xl">
+    <section className="bg-[#D3D2D3] h-[91vh] rounded-4xl">
       { activePage === "home" && <HomePage />}
       { activePage === "chat" && <ChatPage />}
       { activePage === "voice" && <VoicePage />}

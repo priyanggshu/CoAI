@@ -10,7 +10,7 @@ const navItems = [
   { id: "home", label: "Home", icon: BiHomeAlt, activeIcon: BiHome },
   { id: "chat", label: "Chat", icon: IoMdChatbubbles },
   { id: "voice", label: "Voice", icon: RiChatVoiceAiLine, activeIcon: RiChatVoiceAiFill },
-  { id: "collab", label: "Collaborate", icon: PiDevicesFill },
+  { id: "collaborate", label: "Collaborate", icon: PiDevicesFill },
   { id: "history", label: "History", icon: MdManageHistory, activeIcon: MdHistory },
 ];
 
@@ -18,7 +18,7 @@ const Navbar = ({ activePage, setActivePage }) => {
   const [activeNav, setActiveNav] = useState("home");
 
   return (
-    <nav className="bg-[#D3D2D3] backdrop-blur-md py-3 z-30">
+    <nav className="bg-[#EEEFEE] backdrop-blur-md py-3 z-30">
       <div className="px-4 md:px-8 flex justify-between items-center">
       <div className="flex items-center justify-start gap-12">
         {/* Logo */}
