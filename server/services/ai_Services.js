@@ -4,11 +4,7 @@ import axios from "axios";
 const API_KEYS = {
   OPENAI: process.env.OPENAI_API_KEY,
   GEMINI: process.env.GEMINI_API_KEY,
-  PERPLEXITY: process.env.PERPLEXITY_API_KEY,
-  DEEPSEEK: process.env.DEEPSEEK_API_KEY,
-  BOLT: process.env.BOLT_API_KEY,
   CLAUDE: process.env.CLAUDE_API_KEY,
-  GROK: process.env.GROK_API_KEY,
   HUGGINGFACE: process.env.HUGGINGFACE_API_KEY,
 };
 
@@ -31,57 +27,19 @@ export const queryOpenAI = async (prompt) => {
 export const queryGemini = async (prompt) => {
   try {
     const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateText?key=${API_KEYS.GEMINI}`,
-      { prompt: { text: prompt } }
+      `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEYS.GEMINI}`,
+      {
+        contents: [
+          {
+            parts: [{ text: prompt }],
+            role: "user",
+          },
+        ],
+      }
     );
     return response.data.candidates?.[0]?.output || null;
   } catch (error) {
     console.error("Gemini Error:", error.message);
-    return null;
-  }
-};
-
-// Query Perplexity
-export const queryPerplexity = async (prompt) => {
-  try {
-    const response = await axios.post(
-      "http://api.perplexity.ai/v1/answer",
-      { query: prompt },
-      { headers: { Authorization: `Bearer ${API_KEYS.PERPLEXITY}` } }
-    );
-    return response.data.answer || null;
-  } catch (error) {
-    console.error("Perplexity Error:", error.message);
-    return null;
-  }
-};
-
-// Query Deepseek
-export const queryDeepseek = async (prompt) => {
-  try {
-    const response = await axios.post(
-      "https://api.deepseek.com/v1/generate",
-      { query: prompt },
-      { headers: { Authorization: `Bearer ${API_KEYS.DEEPSEEK}` } }
-    );
-    return response.data.result || null;
-  } catch (error) {
-    console.error("Deepseek Error:", error.message);
-    return null;
-  }
-};
-
-// Query Bolt.new
-export const queryBolt = async (prompt) => {
-  try {
-    const response = await axios.post(
-      "https://api.bolt.new/v1/query",
-      { prompt },
-      { headers: { Authorization: `Bearer ${API_KEYS.BOLT}` } }
-    );
-    return response.data.output || null;
-  } catch (error) {
-    console.error("Bolt.new Error :", error.message);
     return null;
   }
 };
@@ -107,21 +65,6 @@ export const queryClaude = async (prompt) => {
     return response.data.completion || null;
   } catch (error) {
     console.error("Claude AI Error:", error.message);
-    return null;
-  }
-};
-
-// Query Grok
-export const queryGrok = async (prompt) => {
-  try {
-    const response = await axios.post(
-      "https://api.grok.x.com/v1/query",
-      { prompt },
-      { headers: { Authorization: `Bearer ${API_KEYS.GROK}` } }
-    );
-    return response.data.response || null;
-  } catch (error) {
-    console.error("Grok Error:", error.message);
     return null;
   }
 };

@@ -29,7 +29,7 @@ export const getUserConversationController = async (req, res) => {
             orderBy: { createdAt: "desc" },
         });
 
-        res.status(203).json({ conversations });
+        res.status(200).json({ conversations });
     } catch (error) {
         res.status(500).json({ error: "Failed to fetch conversations" });
     }

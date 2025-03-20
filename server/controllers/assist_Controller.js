@@ -3,7 +3,7 @@ import fs from "fs";
 import axios from "axios";
 import FormData from "form-data";
 
-import { redisClient } from "../config/redis";
+import { redisClient } from "../config/redis.js";
 import { PrismaClient } from "@prisma/client";
 
 
@@ -36,7 +36,8 @@ export const synthesizeSpeech = async (req, res) => {
         const { text } = req.body;
         const outputFilePath = `output-${Date.now()}.wav`;
 
-        exec(`espeak-ng -w ${outputFilePath} "${text}"`, (error) => {
+        const safeText = text.replace(/[^a-zA-Z0-9 .,!?]/g, "");
+        exec(`espeak-ng -w ${outputFilePath} "${safeText}"`, (error) => {
             if(error) {
                 return res.status(500).json({ error: "Text-to-speech conversion failed" });
             }

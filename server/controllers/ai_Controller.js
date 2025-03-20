@@ -1,15 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import { redisClient } from "../config/redis.js";
-import axios from "axios";
 import {
   queryOpenAI,
   queryGemini,
-  queryPerplexity,
-  queryBolt,
-  queryDeepseek,
   queryClaude,
-  queryGrok,
   queryHuggingFace,
+  mergeResponses,
 } from "../services/ai_Services.js";
 
 const prisma = new PrismaClient();
@@ -31,11 +27,7 @@ export const AIResponseController = async (req, res) => {
     let responses = await Promise.all([
       aiServicePreference === "OpenAI" || !aiServicePreference ? queryOpenAI(message) : null,
       aiServicePreference === "Gemini" || !aiServicePreference ? queryGemini(message) : null,
-      aiServicePreference === "Perplexity" || !aiServicePreference ? queryPerplexity(message) : null,
-      aiServicePreference === "Deepseek" || !aiServicePreference ? queryDeepseek(message) : null,
-      aiServicePreference === "Bolt" || !aiServicePreference ? queryBolt(message) : null,
       aiServicePreference === "Claude" || !aiServicePreference ? queryClaude(message) : null,
-      aiServicePreference === "Grok" || !aiServicePreference ? queryGrok(message) : null,
       aiServicePreference === "HuggingFace" || !aiServicePreference ? queryHuggingFace(message) : null,
     ]);
 
@@ -50,7 +42,7 @@ export const AIResponseController = async (req, res) => {
       data: {
         userId,
         aiService: aiServicePreference || "Multiple",
-        messages: { request: message, response: mergeResponses },
+        messages: { request: message, response: mergedResponse },
       },
     });
 
@@ -69,7 +61,7 @@ export const getAvailableAIController = async (req, res) => {
     if (!aiServices) {
       return;
     } else {
-      res.status(203).json({ services: aiServices });
+      res.status(200).json({ services: aiServices });
     }
   } catch (error) {
     res.status(500).json({ error: "Internal Server error" });

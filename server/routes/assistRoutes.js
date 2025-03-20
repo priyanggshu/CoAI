@@ -1,9 +1,13 @@
 import express from "express";
 import multer from "multer";
-import { synthesizeSpeech, transcribeAudio } from "../controllers/assist_Controller.js";
-import { checkLimitsController } from "../controllers/assist_Controller.js";
-import { fetchAndMergeResponses } from "../controllers/assist_Controller.js";
-import { getRecommendationsController, saveUserQueryController } from "../controllers/assist_Controller.js";
+import {
+  synthesizeSpeech,
+  transcribeAudio,
+  checkLimitsController,
+  fetchAndMergeResponses,
+  getRecommendationsController,
+  saveUserQueryController,
+} from "../controllers/assist_Controller.js";
 
 const router = express.Router();
 
@@ -22,29 +26,48 @@ const upload = multer({
 
 // Voice AI (Speech-to-Text & Text-to-Speech)
 router.post("/speech-to-text", upload.single("audio"), async (req, res) => {
-  try { await transcribeAudio(req, res); } 
-  catch (error) { res.status(500).json({ error: "Speech-to-text processing failed", details: error.message }); }
+  try {
+    await transcribeAudio(req, res);
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        error: "Speech-to-text processing failed",
+        details: error.message,
+      });
+  }
 });
 
 router.post("/text-to-speech", async (req, res) => {
-  try { await synthesizeSpeech(req, res); } 
-    catch (error) { res.status(500).json({ error: "Text-to-speech processing failed", details: error.message }); }
+  try {
+    await synthesizeSpeech(req, res);
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        error: "Text-to-speech processing failed",
+        details: error.message,
+      });
+  }
 });
 
 // AI service's limit checking
 router.get("/check-limits", checkLimitsController);
 
 // AI-Based Recommendations
-router.get('/', getRecommendationsController);
-router.post('/save-query', saveUserQueryController);
+router.get("/", getRecommendationsController);
+router.post("/save-query", saveUserQueryController);
 
 // smart AI aggregator/ merger
 router.post("/fusion", async (req, res) => {
-  try { 
-    const response = await fetchAndMergeResponses(req.body); 
+  try {
+    const response = await fetchAndMergeResponses(req.body);
     res.json(response);
-  } catch (error) { res.status(500).json({ error: "AI merging failed", details: error.message }) }
-
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "AI merging failed", details: error.message });
+  }
 });
 
 export default router;

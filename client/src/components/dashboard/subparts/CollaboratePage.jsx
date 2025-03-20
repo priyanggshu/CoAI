@@ -143,16 +143,13 @@ const CombinedChatPanel = () => {
         <input
           type="text"
           placeholder="Type your message or AI query..."
-          className="flex-1 border rounded px-3 py-2 placeholder:font-dancing focus:outline-none focus:ring focus:ring-blue-200"
+          className="flex-1 border border-stone-400 rounded-md px-3 py-2 placeholder:text-sm placeholder:font-mono focus:outline-none focus:ring focus:ring-blue-200"
         />
-        <button className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition">
-          <FaMicrophone />
-        </button>
         <button
           onClick={handleSend}
-          className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition"
+          className="bg-emerald-600 text-white p-2 rounded-xl hover:bg-green-600 transition"
         >
-          <FaPaperPlane />
+          <FaPaperPlane className="size-5"/>
         </button>
       </div>
     </motion.div>
@@ -163,24 +160,17 @@ const CombinedChatPanel = () => {
 // RightSidebar Component
 const RightSidebar = () => (
   <motion.div
-    className="hidden lg:flex w-72 bg-white border-l p-4 flex-col shadow-md"
+    className="hidden lg:flex w-1/5 bg-[#ecebef] rounded-md mx-1 p-4 flex-col shadow-md"
     initial={{ x: 100 }}
     animate={{ x: 0 }}
     transition={{ duration: 0.5 }}
   >
-    <h3 className="text-lg font-bold mb-4">Voice/Video</h3>
-    <div className="flex gap-4 mb-4">
-      <button className="bg-purple-500 text-white p-2 rounded hover:bg-purple-600 transition">
-        <FaMicrophone />
-      </button>
-      <button className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition">
-        <FaVideo />
-      </button>
-    </div>
-    <h3 className="text-lg font-bold mb-2">Shared Notes</h3>
+    <h3 className="font-Montserrat text-center text-md font-semibold mb-4">Voice/Video</h3>
+    <span className="text-md text-center py-4 text-gray-500 font-Syne">No Co-user connected currently</span>
+    <h3 className="text-lg font-Montserrat font-semibold mb-1">Shared Notes</h3>
     <textarea
       placeholder="Notes..."
-      className="border rounded p-2 flex-1 resize-none focus:outline-none focus:ring focus:ring-blue-200"
+      className="border bg-white border-stone-200 placeholder:text-sm rounded-lg p-2 flex-1 resize-none focus:outline-none focus:ring focus:ring-blue-200"
     ></textarea>
   </motion.div>
 );

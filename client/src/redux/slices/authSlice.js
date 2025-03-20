@@ -7,8 +7,7 @@ export const signInWithGoogle = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const result = await signInWithGooglePopup();
-      console.log("✅ Google authentication successful");
-
+      
       if (!result || !result.user) {
         return rejectWithValue("Google authentication failed.");
       }
@@ -22,8 +21,7 @@ export const signInWithGoogle = createAsyncThunk(
       const response = await axios.post(`${backendUrl}/auth/google`, {
         token: idToken,
       });
-      console.log("✅ Received Oauth response from backend");
-
+      
       if (!response.data || !response.data.token) {
         return rejectWithValue("Invalid response from server.");
       }
@@ -56,12 +54,11 @@ const authSlice = createSlice({
         console.log("Google sign-in successful");
         state.loading = false;
         state.user = action.payload;
-        localStorage.setItem("token", action.payload.token);
       })
       .addCase(signInWithGoogle.rejected, (state, action) => {
         console.error("Google sign-in failed:", action.payload);
         state.loading = false;
-        state.user = action.payload;
+        state.error = action.payload;
       });
   },
 });

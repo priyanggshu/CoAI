@@ -130,16 +130,21 @@ export const refreshTokensController = async (req, res) => {
     for (const user of users) {
       if (!user.authTokens) continue; 
 
-      for(const [service, tokens] of Object.entries(user.authTokens)) {
+      for(const [serviceName, tokens] of Object.entries(user.authTokens)) {
         if (!tokens.refreshToken) continue;
-            
+
         try {
-          const response = await axios.post(`${service.apiUrl}/auth/refresh`, {
+          const serviceObj = await prisma.aIService.findUnique({
+            where: { name: serviceName },
+          });
+          if(!serviceObj) continue;
+
+          const response = await axios.post(`${serviceObj.apiUrl}/auth/refresh`, {
             refreshToken: tokens.refreshToken,
           });
 
           if(!response.data.newToken) {
-            throw new Error(`No new token received from ${service}`);
+            throw new Error(`No new token received from ${serviceName}`);
           }
 
           user.authTokens[service] = {
@@ -153,13 +158,13 @@ export const refreshTokensController = async (req, res) => {
           });
 
           await redisClient.set(
-            `authToken:${user.id}:${service}`,
+            `authToken:${user.id}:${serviceName}`,
             response.data.newToken,
             "EX",
             3600
           );
         } catch (error) {
-          console.error(`Failed to refresh ${service}:`, error.message);
+          console.error(`Failed to refresh ${serviceName}:`, error.message);
         }
       }
     }

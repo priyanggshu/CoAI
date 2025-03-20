@@ -5,6 +5,9 @@ import morgan from "morgan";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import session from "express-session";
+import { RedisStore } from "connect-redis";
+import compression from "compression";
+
 
 import aiRoutes from "./routes/aiRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -18,20 +21,31 @@ import passport from "passport";
 dotenv.config();
 const server = express();
 
+const redisStore = new RedisStore({ client: redisClient });
+
 // Middleware setup
 server.use(cors());
+server.use(compression());
 server.use(morgan("dev"));
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 server.use(cookieParser());
-server.use(helmet({ crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" } }));
+server.use(helmet());
+
 
 // session handling
 server.use(
   session({
+    store: redisStore,
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 1000 * 60 * 60 * 24,
+      httpOnly: true,
+      sameSite: 'lax' 
+    }
   })
 );
 
@@ -42,7 +56,7 @@ server.use(passport.session());
 const connectRedis = async () => {
   try {
     await redisClient.connect();
-    console.log("✅ Connected to Redis");
+    console.log("✅ Redis");
   } catch (error) {
     console.error("❌ Failed to connect to Redis:", error);
   }
@@ -51,6 +65,7 @@ const connectRedis = async () => {
 connectRedis();
 
 // Route handlers
+server.get("/health", (_, res) => res.status(200).json({ status: "OK" }));
 server.get("/", (req, res) => res.send("Server running"));
 server.use("/auth", authRoutes);
 server.use("/chat", chatRoutes);
