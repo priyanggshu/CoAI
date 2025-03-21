@@ -1,21 +1,58 @@
-import { useState } from "react";
-import { BiHome, BiHomeAlt } from "react-icons/bi";
+import { useEffect, useRef, useState } from "react";
+import axios from "axios";
 import { IoMdChatbubbles } from "react-icons/io";
 import { RiChatVoiceAiFill, RiChatVoiceAiLine } from "react-icons/ri";
 import { PiDevicesFill } from "react-icons/pi";
-import { MdManageHistory, MdHistory } from "react-icons/md";
-import { FaChevronDown } from "react-icons/fa";
+import {FaSignOutAlt, FaSun, FaMoon, FaChevronDown } from "react-icons/fa";
 
 const navItems = [
-  { id: "home", label: "Home", icon: BiHomeAlt, activeIcon: BiHome },
   { id: "chat", label: "Chat", icon: IoMdChatbubbles },
   { id: "voice", label: "Voice", icon: RiChatVoiceAiLine, activeIcon: RiChatVoiceAiFill },
   { id: "collaborate", label: "Collaborate", icon: PiDevicesFill },
-  { id: "history", label: "History", icon: MdManageHistory, activeIcon: MdHistory },
 ];
 
 const Navbar = ({ activePage, setActivePage }) => {
-  const [activeNav, setActiveNav] = useState("home");
+  const [activeNav, setActiveNav] = useState("chat");
+  const [user, setUser] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const backendUrl = import.meta.env.VITE_BACKEND_URL;
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`${backendUrl}/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUser(response.data.user);
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if(dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside); 
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.reload();
+  };
+
+  const toggleMode = () => {
+    setDarkMode(!darkMode);
+    document.documentElement.classList.toggle("dark");
+  };
 
   return (
     <nav className="bg-[#EEEFEE] backdrop-blur-md py-3 z-30">
@@ -50,14 +87,54 @@ const Navbar = ({ activePage, setActivePage }) => {
         </div>
 
         {/* User Profile Section */}
-        <div className="flex items-center space-x-3 cursor-pointer border-r border-gray-500 hover:scale-105 px-1 rounded-3xl transition-all duration-200">
-          <img
-            src="https://i.pravatar.cc/40"
-            alt="User Avatar"
-            className="size-11 rounded-full object-cover border border-stone-600/40"
-          />
+        {/* User Profile Section */}
+        <div className="relative" ref={dropdownRef}>
+          <div
+            className="flex items-center space-x-2 cursor-pointer border border-gray-400 dark:border-gray-600 px-2 rounded-3xl hover:scale-105 transition-all duration-200"
+            onClick={() => setDropdownOpen((prev) => !prev)}
+          >
+            <img
+              src={user?.picture}
+              alt="User Avatar"
+              className="size-11 rounded-full object-cover border border-stone-600/40"
+            />
+            <FaChevronDown size={12} className="hover:text-blue-700 ml-1" />
+          </div>
 
-          <FaChevronDown size={12} className=" hover:text-blue-700  ml-1" />
+          {/* Dropdown Menu */}
+          {dropdownOpen && (
+            <div className="absolute right-0 mt-2 w-60 bg-white dark:bg-gray-300 border rounded-xl shadow-lg p-4 z-50">
+              <div className="flex items-center space-x-3 mb-3">
+                <img
+                  src={user?.picture}
+                  alt="User profile"
+                  className="w-10 h-10 rounded-full border border-stone-600/40"
+                />
+                <div className="text-sm">
+                  <p className="font-semibold">{user?.name || "User Name"}</p>
+                  <p className="text-gray-500 dark:text-gray-400">{user?.email || "email@example.com"}</p>
+                </div>
+              </div>
+
+              <hr className="my-2 border-gray-300 dark:border-gray-700" />
+
+              <button
+                onClick={toggleMode}
+                className="flex items-center w-full py-2 px-3 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-md text-sm"
+              >
+                {darkMode ? <FaSun className="mr-2" /> : <FaMoon className="mr-2" />}
+                Toggle {darkMode ? "Light" : "Dark"} Mode
+              </button>
+
+              <button
+                onClick={handleLogout}
+                className="flex items-center w-full py-2 px-3 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-md text-sm mt-1 text-red-500"
+              >
+                <FaSignOutAlt className="mr-2" />
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </nav>

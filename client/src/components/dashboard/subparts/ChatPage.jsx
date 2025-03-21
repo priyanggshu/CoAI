@@ -13,9 +13,9 @@ const ChatPage = () => {
   const [message, setMessage] = useState("");
   const [responses, setResponses] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [aiPreference, setAIPreference] = useState(""); // Optional dropdown to choose service
+  const [aiPreference, setAIPreference] = useState(""); 
 
-  const userId = "test-user-id"; // Replace with real userId (from context or auth)
+  const userId = "test-user-id";
 
   const handleSend = async () => {
     if (!message.trim()) return;
@@ -25,7 +25,7 @@ const ChatPage = () => {
       const res = await axios.post("/api/ai/query", {
         userId,
         message,
-        aiServicePreference: aiPreference, // '' = all, or specific AI
+        aiServicePreference: aiPreference,
       });
 
       const { response, fromCache } = res.data;
@@ -65,25 +65,17 @@ const ChatPage = () => {
           {/* services */}
           <div className="pt-4 flex flex-col justify-between font-dancing text-xl font-bold">
             {[
-              {
-                icon: FaMagic,
-                label: "All in one Fusion",
-                color: "text-purple-900",
-              },
-              {
-                icon: PiOpenAiLogoDuotone,
-                label: "OpenAI",
-                color: "text-black",
-              },
+              { icon: FaMagic, label: "All in one Fusion", color: "text-purple-900" },
+              { icon: PiOpenAiLogoDuotone, label: "OpenAI", color: "text-black" },
               { icon: RiGeminiFill, label: "Gemini", color: "text-blue-400" },
               { icon: RiClaudeFill, label: "Claude", color: "text-orange-600" },
-              {
-                icon: SiHuggingface,
-                label: "Hugging Face",
-                color: "text-yellow-600",
-              },
+              { icon: SiHuggingface, label: "Hugging Face", color: "text-yellow-600" },
             ].map((service) => (
-              <button className="p-2 bg-gray-400/10 hover:bg-stone-400/15 hover:border-x hover:border-stone-400 text-gray-800 mb-3 w-52 gap-6 flex items-center rounded-xl">
+              <button
+              key={service.label}
+              onClick={() => setAIPreference(service.label)}
+              className={`p-2 bg-gray-400/10 hover:bg-stone-400/15 hover:border-x hover:border-stone-400 text-gray-800 
+                          mb-3 w-52 gap-6 flex items-center rounded-xl ${ aiPreference === service.label ? "border border-indigo-500 bg-indigo-100/30" : "" }`}>
                 {React.createElement(service.icon, {
                   className: `ml-2 size-6 ${service.color}`,
                 })}
@@ -110,18 +102,54 @@ const ChatPage = () => {
           </p>
         </div>
         {/* chat */}
-        <div className="flex flex-col items-center mx-auto rounded-lg w-5/7">
-          
+        <div className="flex flex-col mx-auto rounded-lg w-11/12 max-w-4xl h-[calc(100vh-150px)] p-4 overflow-hidden">
+          {/* Chat Display */}
+          <div className="flex-1 overflow-y-auto mb-4 space-y-4 px-2">
+            {responses.length === 0 ? (
+              <p className="text-gray-500 text-center mt-10 font-mono">
+                Start a conversation with AI...
+              </p>
+            ) : (
+              responses.map((entry, index) => (
+                <div key={index} className="space-y-2">
+                  {/* User Message */}
+                  <div className="self-end bg-blue-100 text-gray-900 p-3 rounded-xl max-w-xl ml-auto">
+                    <p className="font-medium font-Syne">You:</p>
+                    <p className="font-mono text-sm">{entry.query}</p>
+                  </div>
+
+                  {/* AI Response */}
+                  <div className="self-start bg-gray-100 text-gray-900 p-3 rounded-xl max-w-xl">
+                    <p className="font-medium font-Syne flex items-center gap-2">
+                      AI:{" "}
+                      {entry.cached && (
+                        <span className="text-xs text-purple-600 font-mono">
+                          (from cache)
+                        </span>
+                      )}
+                    </p>
+                    <p className="font-mono text-sm whitespace-pre-line">
+                      {entry.answer}
+                    </p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
           {/* Text input */}
-          <div className="w-4/5 p-3 flex items-center  mx-auto gap-2">
+          <div className="w-full p-3 flex items-center gap-2 border-t border-gray-300">
             <input
               type="text"
-              placeholder="Ask AI"
-              className="flex-1 h-14 border border-stone-400/40 rounded-xl px-3 py-2 placeholder:text-sm placeholder:font-mono focus:outline-none focus:ring focus:ring-blue-200"
+              placeholder="Ask AI..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              className="flex-1 h-12 border border-stone-400/40 rounded-xl px-3 py-2 placeholder:text-sm placeholder:font-mono focus:outline-none focus:ring focus:ring-blue-200"
             />
             <button
               onClick={handleSend}
-              className="bg-indigo-500/90 hover:bg-indigo-700 text-white p-2 rounded-3xl transition"
+              disabled={loading}
+              className="bg-indigo-500/90 hover:bg-indigo-700 text-white p-2 rounded-3xl transition disabled:opacity-50"
             >
               <FiCornerRightUp className="size-6" />
             </button>

@@ -63,6 +63,27 @@ export const googleAuthController = async (req, res) => {
   }
 };
 
+export const getUserProfileController = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized: User ID missing" });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, name: true, email: true, picture: true },
+    });
+
+    if(!user) return res.status(404).json({ error: "User not found" });
+
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error("Fetch user profile error:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+}
+
 // Auto-login AI Services
 export const autoLoginAIController = async (req, res) => {
   try {
@@ -147,7 +168,7 @@ export const refreshTokensController = async (req, res) => {
             throw new Error(`No new token received from ${serviceName}`);
           }
 
-          user.authTokens[service] = {
+          user.authTokens[serviceName] = {
             accessToken: response.data.newToken,
             refreshToken: tokens.refreshToken,
           };
