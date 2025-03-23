@@ -24,7 +24,7 @@ export const AIResponseController = async (req, res) => {
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    let responses = await Promise.all([
+    let responses = await Promise.allSettled([
       aiServicePreference === "OpenAI" || !aiServicePreference ? queryOpenAI(message) : null,
       aiServicePreference === "Gemini" || !aiServicePreference ? queryGemini(message) : null,
       aiServicePreference === "Claude" || !aiServicePreference ? queryClaude(message) : null,

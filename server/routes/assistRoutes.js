@@ -8,6 +8,7 @@ import {
   getRecommendationsController,
   saveUserQueryController,
 } from "../controllers/assist_Controller.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -25,7 +26,7 @@ const upload = multer({
 });
 
 // Voice AI (Speech-to-Text & Text-to-Speech)
-router.post("/speech-to-text", upload.single("audio"), async (req, res) => {
+router.post("/speech-to-text", authMiddleware, upload.single("audio"), async (req, res) => {
   try {
     await transcribeAudio(req, res);
   } catch (error) {
@@ -38,7 +39,7 @@ router.post("/speech-to-text", upload.single("audio"), async (req, res) => {
   }
 });
 
-router.post("/text-to-speech", async (req, res) => {
+router.post("/text-to-speech", authMiddleware, async (req, res) => {
   try {
     await synthesizeSpeech(req, res);
   } catch (error) {
@@ -52,14 +53,14 @@ router.post("/text-to-speech", async (req, res) => {
 });
 
 // AI service's limit checking
-router.get("/check-limits", checkLimitsController);
+router.get("/check-limits", authMiddleware, checkLimitsController);
 
 // AI-Based Recommendations
-router.get("/", getRecommendationsController);
-router.post("/save-query", saveUserQueryController);
+router.get("/", authMiddleware, getRecommendationsController);
+router.post("/save-query", authMiddleware, saveUserQueryController);
 
 // smart AI aggregator/ merger
-router.post("/fusion", async (req, res) => {
+router.post("/fusion", authMiddleware, async (req, res) => {
   try {
     const response = await fetchAndMergeResponses(req.body);
     res.json(response);

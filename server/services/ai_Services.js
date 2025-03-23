@@ -85,7 +85,10 @@ export const queryHuggingFace = async (prompt) => {
 };
 
 export const mergeResponses = (response) => {
-  const validResponses = response.filter((res) => res !== null);
-  if (validResponses.length === 0) return "All AI services failed.";
+  const validResponses = response
+    .filter(res => res.status === "fulfilled" && res.value)
+    .map(res => res.value);
+
+  if (validResponses.length === 0) return null;
   return validResponses.join(" | ");
 };
