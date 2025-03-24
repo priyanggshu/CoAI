@@ -1,94 +1,180 @@
 import axios from "axios";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
 
 // API keys for all of the services
 const API_KEYS = {
-  OPENAI: process.env.OPENAI_API_KEY,
+  DEEPSEEK: process.env.DEEPSEEK_V3_0324,
   GEMINI: process.env.GEMINI_API_KEY,
-  CLAUDE: process.env.CLAUDE_API_KEY,
-  HUGGINGFACE: process.env.HUGGINGFACE_API_KEY,
+  QWEN: process.env.QWEN_QWQ_32B,
+  MISTRAL: process.env.MISTRAL_S_31_24B,
+  META: process.env.META_LLAMA_31_8B,
+  OPENCHAT: process.env.OPENCHAT_35_7B,
 };
 
-// Query OpenAI GPT-4
-export const queryOpenAI = async (prompt) => {
+// Query Deepseek V3-0324
+export const queryDeepseek = async (prompt) => {
   try {
     const response = await axios.post(
-      "https://api.openai.com/v1/chat/completions",
-      { model: "gpt-4", messages: [{ role: "user", content: prompt }] },
-      { headers: { Authorization: `Bearer ${API_KEYS.OPENAI}` } }
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        model: "deepseek/deepseek-chat-v3-0324:free",
+        messages: [{ role: "user", content: prompt }],
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${API_KEYS.DEEPSEEK}`,
+          "Content-Type": "application/json",
+          "X-Title": "CoAI Chat",
+        },
+      }
     );
     return response.data.choices[0].message.content;
   } catch (error) {
-    console.error("OpenAI Error:", error.message);
-    return null;
+    console.error(
+      "DeepSeek V3 Error:",
+      error.response?.status,
+      error.response?.data || error.message
+    );
+    return "Sorry, I couldn't generate a response at the moment. Please try again later.";
   }
 };
 
 // Query Google Gemini
+const genAI = new GoogleGenerativeAI(API_KEYS.GEMINI);
+
 export const queryGemini = async (prompt) => {
   try {
-    const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEYS.GEMINI}`,
-      {
-        contents: [
-          {
-            parts: [{ text: prompt }],
-            role: "user",
-          },
-        ],
-      }
-    );
-    return response.data.candidates?.[0]?.output || null;
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+
+    return text || null;
   } catch (error) {
     console.error("Gemini Error:", error.message);
     return null;
   }
 };
 
-// Query Claude AI
-export const queryClaude = async (prompt) => {
+//  Query Qwen QWB
+export const queryQwen = async (prompt) => {
   try {
     const response = await axios.post(
-      "https://api.anthropic.com/v1/complete",
+      "https://openrouter.ai/api/v1/chat/completions",
       {
-        model: "claude-2",
-        prompt: `Human: ${prompt}\nAssistant:`,
-        max_tokens: 512,
+        model: "qwen/qwq-32b:free",
+        messages: [{ role: "user", content: prompt }],
       },
       {
         headers: {
-          "x-api-key": API_KEYS.CLAUDE,
+          Authorization: `Bearer ${API_KEYS.QWEN}`,
           "Content-Type": "application/json",
-          "anthropic-version": "2023-06-01",
+          "X-Title": "CoAI Chat",
         },
       }
     );
-    return response.data.completion || null;
+    return response.data.choices[0].message.content;
   } catch (error) {
-    console.error("Claude AI Error:", error.message);
-    return null;
+    console.error(
+      "Qwen QWQ 32B Error:",
+      error.response?.status,
+      error.response?.data || error.message
+    );
+    return "Sorry, I couldn't generate a response at the moment. Please try again later.";
   }
 };
 
-// Query Hugging Face Inference API
-export const queryHuggingFace = async (prompt) => {
+
+// Query Mistral
+export const queryMistral = async (prompt) => {
   try {
     const response = await axios.post(
-      "https://api-inference.huggingface.co/models/facebook/blenderbot-3B",
-      { inputs: prompt },
-      { headers: { Authorization: `Bearer ${API_KEYS.HUGGINGFACE}` } }
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        model: "mistralai/mistral-small-3.1-24b-instruct:free",
+        messages: [{ role: "user", content: prompt }],
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${API_KEYS.MISTRAL}`,
+          "Content-Type": "application/json",
+          "X-Title": "CoAI Chat",
+        },
+      }
     );
-    return response.data.generated_text || null;
+    return response.data.choices[0].message.content;
   } catch (error) {
-    console.error("Hugging Face Error:", error.message);
-    return null;
+    console.error(
+      "Mistral 3.1 24B Error:",
+      error.response?.status,
+      error.response?.data || error.message
+    );
+    return "Sorry, Mistral couldn't respond at the moment. Please try again later.";
+  }
+};
+
+
+// Query Meta
+export const queryMeta = async (prompt) => {
+  try {
+    const response = await axios.post(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        model: "meta-llama/llama-3.1-8b-instruct:free",
+        messages: [{ role: "user", content: prompt }],
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${API_KEYS.META}`,
+          "Content-Type": "application/json",
+          "X-Title": "CoAI Chat",
+        },
+      }
+    );
+    return response.data.choices[0].message.content;
+  } catch (error) {
+    console.error(
+      "Meta Llama 3.1 8B Error:",
+      error.response?.status,
+      error.response?.data || error.message
+    );
+    return "Sorry, Meta Llama couldn't respond at the moment. Please try again later.";
+  }
+};
+
+// Query Openchat
+export const queryOpenchat = async (prompt) => {
+  try {
+    const response = await axios.post(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        model: "openchat/openchat-7b:free",
+        messages: [{ role: "user", content: prompt }],
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${API_KEYS.OPENCHAT}`,
+          "Content-Type": "application/json",
+          "X-Title": "CoAI Chat",
+        },
+      }
+    );
+    return response.data.choices[0].message.content;
+  } catch (error) {
+    console.error(
+      "OpenChat 3.5 7B Error:",
+      error.response?.status,
+      error.response?.data || error.message
+    );
+    return "Sorry, OpenChat couldn't respond at the moment. Please try again later.";
   }
 };
 
 export const mergeResponses = (response) => {
   const validResponses = response
     .filter(res => res.status === "fulfilled" && res.value)
-    .map(res => res.value);
+    .map((res, idx) => `AI ${idx + 1}: ${res.value.trim()}`);
 
   if (validResponses.length === 0) return null;
-  return validResponses.join(" | ");
+  return validResponses.join("\n\n---\n\n");
 };

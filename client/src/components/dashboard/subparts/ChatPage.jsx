@@ -11,7 +11,7 @@ import { FiCornerRightUp } from "react-icons/fi";
 
 const aiServices = [
   { icon: FaMagic, label: "All in one Fusion", color: "text-purple-900" },
-  { icon: PiOpenAiLogoDuotone, label: "OpenAI", color: "text-black" },
+  { icon: PiOpenAiLogoDuotone, label: "QWEN32B", color: "text-black" },
   { icon: RiGeminiFill, label: "Gemini", color: "text-blue-400" },
   { icon: RiClaudeFill, label: "Claude", color: "text-orange-600" },
   { icon: SiHuggingface, label: "Hugging Face", color: "text-yellow-600" },
@@ -21,12 +21,9 @@ const ChatPage = () => {
   const [message, setMessage] = useState("");
   const [chatHistories, setChatHistories] = useState({});
   const [loading, setLoading] = useState(false);
-  // const [responses, setResponses] = useState([]);
   const [aiPreference, setAIPreference] = useState("All in one Fusion");
   const [viewingHistoryFor, setViewingHistoryFor] =
     useState("All in one Fusion");
-
-  const userId = "test-user-id";
 
   useEffect(() => {
     // loads the last preference from local Storage
@@ -47,11 +44,16 @@ const ChatPage = () => {
     if (!message.trim()) return;
     setLoading(true);
 
+    const token = localStorage.getItem("token");
+    
     try {
       const res = await axios.post(`${backendUrl}/ai/query`, {
-        userId,
         message,
         aiServicePreference: aiPreference,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
       });
 
       const { response, fromCache } = res.data;
