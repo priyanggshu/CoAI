@@ -62,12 +62,12 @@ export const AIResponseController = async (req, res) => {
         break;
       case "All in one Fusion":
         const aiResults = await Promise.allSettled([
+          queryOpenchat(message),
           queryDeepseek(message),
           queryGemini(message),
-          queryQwen(message),
           queryMistral(message),
+          queryQwen(message),
           queryMeta(message),
-          queryOpenchat(message),
         ]);
         aiResponse = mergeResponses(aiResults);
         if (!aiResponse) {
