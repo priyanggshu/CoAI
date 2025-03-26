@@ -8,14 +8,33 @@ import { PrismaClient } from "@prisma/client";
 // Voice Controllers (TTS && STT )
 export const transcribeAudio = async (req, res) => {
   try {
-    const buffer = req.file.buffer;
-    const selectedAIService = req.body.selectedAIService;
-    const userId = req.user?.id;
-
-    if(!selectedAIService) {
-        return res.status(400).json({ error: "AI service not selected" });
+    if (!req.file) {
+      return res.status(400).json({ error: "No audio file uploaded" });
     }
 
+    const inputFilePath = `uploads/audio-${Date.now()}.webm`;
+    const outputFilePath = `uploads/audio-${Date.now()}.wav`;
+
+    fs.writeFileSync(inputFilePath, req.file.buffer);
+
+    // Convert WebM to WAV using FFmpeg
+    await new Promise((resolve, reject) => {
+      exec(
+        `ffmpeg -i ${inputFilePath} -acodec pcm_s16le -ar 16000 ${outputFilePath}`,
+        (error) => {
+          if (error) {
+            console.error("FFmpeg conversion failed:", error);
+            reject(new Error("Audio conversion failed"));
+          }
+          resolve();
+        }
+      );
+    });
+
+    // Read the converted WAV file
+    const buffer = fs.readFileSync(outputFilePath);
+
+    // Upload to AssemblyAI
     const uploadResponse = await axios.post(
       "https://api.assemblyai.com/v2/upload",
       buffer,
@@ -27,8 +46,17 @@ export const transcribeAudio = async (req, res) => {
       }
     );
 
-    const uploadUrl = uploadResponse.data.upload_url;
+    fs.unlinkSync(inputFilePath); // Delete WebM
+    fs.unlinkSync(outputFilePath); // Delete WAV
 
+    if (!uploadResponse.data || !uploadResponse.data.upload_url) {
+      throw new Error("Failed to upload audio to AssemblyAI");
+    }
+
+    const uploadUrl = uploadResponse.data.upload_url;
+    console.log("Upload successful:", uploadUrl);
+
+    // Send for transcription
     const transcriptResponse = await axios.post(
       "https://api.assemblyai.com/v2/transcript",
       { audio_url: uploadUrl },
@@ -40,11 +68,16 @@ export const transcribeAudio = async (req, res) => {
       }
     );
 
-    const transcriptId = transcriptResponse.data.id;
+    if (!transcriptResponse.data || !transcriptResponse.data.id) {
+      throw new Error("Failed to create transcription request");
+    }
 
+    const transcriptId = transcriptResponse.data.id;
     let transcription = "";
     let completed = false;
-    while (!completed) {
+    let retries = 20;
+
+    while (!completed && retries > 0) {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       const pollingRes = await axios.get(
@@ -63,33 +96,29 @@ export const transcribeAudio = async (req, res) => {
       } else if (pollingRes.data.status === "error") {
         throw new Error("AssemblyAI transcription failed");
       }
+
+      retries--;
     }
 
+    if (!completed) {
+      throw new Error("Transcription polling timed out");
+    }
+
+    // Send text to AI model for response
+    const authHeader = req.headers.authorization || "";
     const aiResponseRes = await axios.post(
-        `${process.env.BACKEND_URL}/ai/query`,
-        {
-            message: transcription,
-            aiServicePreference: selectedAIService,
-        },
-        {
-            headers: {
-                Authorization: req.headers.authorization,
-            },
-        }
+      `${process.env.BACKEND_URL}/ai/query`,
+      {
+        message: transcription,
+        aiServicePreference: req.body.selectedAIService,
+      },
+      {
+        headers: { Authorization: authHeader },
+      }
     );
 
     const aiText = aiResponseRes.data.response;
-
-    const safeText = aiText.replace(/[^a-zA-Z0-9 .,!?]/g, "");
-    const outputFilePath = `output-${Date.now()}.wav`;
-
-    exec(`espeak-ng -w ${outputFilePath} "${safeText}"`, (error) => {
-        if(error) {
-            return res.status(500).json({ error: "Text-to-speech conversion failed" });
-        }
-    });
-
-    res.json({ transcription, aiResponse: aiText, audioFile: outputFilePath });
+    res.json({ transcription, aiResponse: aiText });
   } catch (error) {
     console.error("STT Error:", error.message);
     res.status(500).json({ error: error.message });
@@ -99,17 +128,25 @@ export const transcribeAudio = async (req, res) => {
 export const synthesizeSpeech = async (req, res) => {
   try {
     const { text } = req.body;
-    const outputFilePath = `output-${Date.now()}.wav`;
+    const outputFilePath = `uploads/output-${Date.now()}.wav`;
 
     const safeText = text.replace(/[^a-zA-Z0-9 .,!?]/g, "");
     exec(`espeak-ng -w ${outputFilePath} "${safeText}"`, (error) => {
       if (error) {
-        return res.status(500).json({ error: "Text-to-speech conversion failed" });
+        return res
+          .status(500)
+          .json({ error: "Text-to-speech conversion failed" });
       }
 
-      res.download(outputFilePath, () => {
-        fs.unlinkSync(outputFilePath); // delete temp file after sending
-      });
+      setTimeout(() => {
+        if (!fs.existsSync(outputFilePath)) {
+          return res.status(500).json({ error: "TTS file generation failed." });
+        }
+
+        res.json({
+          audioUrl: `${process.env.BACKEND_URL}/uploads/${outputFilePath}`,
+        });
+      }, 1000);
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
