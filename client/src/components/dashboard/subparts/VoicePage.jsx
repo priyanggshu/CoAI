@@ -1,37 +1,37 @@
-import axios from "axios";
 import React, { useRef, useState } from "react";
+import axios from "axios";
+import Recorder from "recorder-js";
 import { FaMicrophoneAlt, FaUserCircle } from "react-icons/fa";
 import { GrHistory } from "react-icons/gr";
 import { BsRobot } from "react-icons/bs";
 
 const VoicePage = () => {
-  const [transcription, setTranscription] = useState("");
-  const [aiResponse, setAiResponse] = useState("");
-  const [conversation, setConversation] = useState([]);
   const [isRecording, setIsRecording] = useState(false);
   const [selectedAI, setSelectedAI] = useState("Openchat");
+  const [conversation, setConversation] = useState([]);
 
+  const backend_url = import.meta.env.VITE_BACKEND_URL;
+  const streamRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
-  const backend_url = import.meta.env.VITE_BACKEND_URL;
 
   const startRecording = async () => {
     try {
+      console.log("🎙️ Requesting microphone access...");
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: "audio/webm" });
-      audioChunksRef.current = [];
 
-      mediaRecorderRef.current.ondataavailable = (event) => {
+      streamRef.current = stream;
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+
+      mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
         }
       };
 
-      mediaRecorderRef.current.onstop = async () => {
-        if (audioChunksRef.current.length === 0) {
-          console.error("No audio recorded.");
-          return;
-        }
+      mediaRecorder.onstop = async () => {
+        if (audioChunksRef.current.length === 0) return;
 
         const audioBlob = new Blob(audioChunksRef.current, {
           type: "audio/wav",
@@ -40,27 +40,35 @@ const VoicePage = () => {
         sendAudio(audioBlob);
       };
 
-      mediaRecorderRef.current.start();
+      mediaRecorder.start();
       setIsRecording(true);
     } catch (error) {
-      console.error("Microphone access denied:", error);
+      console.error("🚨 Microphone access denied:", error);
       setIsRecording(false);
     }
   };
 
-  const stopRecording = () => {
-    if (
-      mediaRecorderRef.current &&
-      mediaRecorderRef.current.state !== "inactive"
-    ) {
-      mediaRecorderRef.current.stop();
+  const stopRecording = async () => {
+    try {
+      if (mediaRecorderRef.current) mediaRecorderRef.current.stop();
+
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
+      setIsRecording(false);
+    } catch (error) {
+      console.error("Error stopping recording:", error);
     }
-    setIsRecording(false);
   };
 
   const sendAudio = async (audioBlob) => {
+    if (!audioBlob || audioBlob.size === 0) {
+      console.error("Error: Audio blob is empty or undefined.");
+      return;
+    }
+
     const formData = new FormData();
-    formData.append("audio", audioBlob);
+    formData.append("audio", audioBlob, "audio.wav");
     formData.append("selectedAIService", selectedAI);
 
     try {
@@ -68,13 +76,11 @@ const VoicePage = () => {
         `${backend_url}/assist/speech-to-text`,
         formData,
         {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
       );
-      setTranscription(res.data.transcription);
-      setAiResponse(res.data.aiResponse);
+
+      if (!res.data?.transcription) return;
 
       setConversation((prev) => [
         ...prev,
@@ -82,29 +88,28 @@ const VoicePage = () => {
         { type: "ai", text: res.data.aiResponse },
       ]);
 
-      if (res.data.audioFile) {
-        playTTS(res.data.audioFile);
-      }
+      if (res.data.audioFile) playTTS(res.data.audioFile);
     } catch (error) {
-      console.error("Error processing audio", error);
+      console.error(
+        "Error processing audio",
+        error.response?.data || error.message
+      );
     }
   };
 
-  const playTTS = async (audioFile) => {
+  const playTTS = async (text) => {
     try {
-      const res = await axios.post(`${backend_url}/assist/text-to-speech`, 
-        { audioFile },
-      {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      });
+      const res = await axios.post(
+        `${backend_url}/assist/text-to-speech`,
+        { text },
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
 
-      if (res.data.audioUrl) {
-        const audio = new Audio(res.data.audioUrl);
-        audio.play();
-      } else {
-        console.error("Audio URL not found");
-      }
+      if (res.data.audioUrl) new Audio(res.data.audioUrl);
+
+      audio.play();
     } catch (error) {
       console.error("TTS Error:", error);
     }
@@ -207,7 +212,7 @@ const VoicePage = () => {
           >
             <option value="Openchat">Openchat</option>
             <option value="Gemini">Gemini</option>
-            <option value="Claude">Claude</option>
+            <option value="Meta">Meta</option>
           </select>
         </div>
 

@@ -16,10 +16,12 @@ export const AIResponseController = async (req, res) => {
   const { message, aiServicePreference } = req.body;
   const userId = req.user?.id;
   const cacheKey = `chat:${aiServicePreference}:${message}`;
-  console.log("aiServicePreference:", aiServicePreference); // 3
+  console.log("Request received at /ai/query");
+  console.log("aiServicePreference:", aiServicePreference);
   console.log("message:", message);
   
   if (!userId || !message || !aiServicePreference) {
+    console.error("❌ Error: Missing required fields");
     return res.status(400).json({ error: "Missing required fields" });
   }
   

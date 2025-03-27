@@ -1,8 +1,11 @@
 import express from "express";
 import multer from "multer";
+import axios from "axios";
+import dotenv from "dotenv";
+import fs from "fs";
+import FormData from "form-data";
 import {
   synthesizeSpeech,
-  transcribeAudio,
   checkLimitsController,
   fetchAndMergeResponses,
   getRecommendationsController,
@@ -11,44 +14,56 @@ import {
 import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
+const upload = multer({ dest: "uploads/" });
+dotenv.config();
 
-// store temp files in mempry before processing
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith("audio/")) {
-      cb(null, true);
-    } else {
-      cb(new Error("Only audio files are allowed"), false);
-    }
-  },
-});
+if (!fs.existsSync("uploads")) {
+  fs.mkdirSync("uploads");
+}
 
 // Voice AI (Speech-to-Text & Text-to-Speech)
-router.post("/speech-to-text", authMiddleware, upload.single("audio"), async (req, res) => {
-  try {
-    await transcribeAudio(req, res);
-  } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: "Speech-to-text processing failed",
-        details: error.message,
-      });
+router.post( "/speech-to-text", authMiddleware, upload.single("audio"), async (req, res) => {
+  for (let i = 0; i < 4; i++) {
+    try {
+      if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+
+      const formData = new FormData();
+      formData.append("file", fs.createReadStream(req.file.path));
+
+      const response = await axios.post(
+        "https://api-inference.huggingface.co/models/openai/whisper-tiny",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.HF_API_KEY}`,
+            ...formData.getHeaders(),
+          }
+        }
+      );
+
+      if (!response.data || !response.data.text) {
+        console.error("STT Error:", response.data);
+        return res.status(500).json({ error: "Transcription failed" });
+      }
+
+      fs.unlinkSync(req.file.path);
+      res.json({ transcript: response.data.text });
+    } catch (error) {
+      console.error("Error:", error.response?.data || error.message);
+      res.status(500).json({ error: "Transcription failed" });
+    }
   }
-});
+}
+);
 
 router.post("/text-to-speech", authMiddleware, async (req, res) => {
   try {
     await synthesizeSpeech(req, res);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: "Text-to-speech processing failed",
-        details: error.message,
-      });
+    res.status(500).json({
+      error: "Text-to-speech processing failed",
+      details: error.message,
+    });
   }
 });
 

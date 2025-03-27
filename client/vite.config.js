@@ -7,6 +7,7 @@ import path from 'path';
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   define: {
+    global: "globalThis",
     'process.env': {},
   },
   resolve: {
