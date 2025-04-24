@@ -5,6 +5,8 @@ import morgan from "morgan";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import session from "express-session";
+import { createServer } from "http";
+import { Server as SocketServer } from "socket.io";
 
 import aiRoutes from "./routes/aiRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -14,7 +16,7 @@ import assistRoutes from "./routes/assistRoutes.js"
 import { redisClient } from "./config/redis.js";
 import passport from "passport";
 
-// env variables config
+// env config
 dotenv.config();
 const server = express();
 
@@ -34,6 +36,11 @@ server.use(
     saveUninitialized: true,
   })
 );
+
+const httpServer = createServer(server);
+const io = new SocketServer(httpServer, {
+  cors: { origin: "*" }
+});
 
 server.use(passport.initialize());
 server.use(passport.session());
@@ -61,7 +68,26 @@ server.use("/chat", chatRoutes);
 server.use("/ai", aiRoutes);
 server.use("/assist", assistRoutes);
 
+
+// webtrc
+io.on("connection", socket => {
+  console.log("🔌 New socket connection:", socket.id);
+
+  socket.on("join-room", roomId => {
+    socket.join(roomId);
+    socket.to(roomId).emit("user-joined", socket.id);
+  });
+
+  socket.on("signal", ({ to, signal }) => {
+    io.to(to).emit("signal", { from: socket.id, signal });
+  });  
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+});
+
 // Server vroom vroom 💨
-server.listen(process.env.PORT, () => {
-  console.log(`🚀 Server running on port ${process.env.PORT}`);
+httpServer.listen(process.env.PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running with WebSocket on port ${process.env.PORT}`);
 });

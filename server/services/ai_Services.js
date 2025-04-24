@@ -1,15 +1,14 @@
 import axios from "axios";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-
-// API keys for all of the services
+// API keys
 const API_KEYS = {
   DEEPSEEK: process.env.DEEPSEEK_V3_0324,
   GEMINI: process.env.GEMINI_API_KEY,
   QWEN: process.env.QWEN_QWQ_32B,
   MISTRAL: process.env.MISTRAL_S_31_24B,
   META: process.env.META_LLAMA_31_8B,
-  OPENCHAT: process.env.OPENCHAT_35_7B,
+  NVIDIA: process.env.NVIDIA,
 };
 
 // Query Deepseek V3-0324
@@ -142,18 +141,18 @@ export const queryMeta = async (prompt) => {
   }
 };
 
-// Query Openchat
-export const queryOpenchat = async (prompt) => {
+// Query Nvidia
+export const queryNvidia = async (prompt) => {
   try {
     const response = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
-        model: "openchat/openchat-7b:free",
+        model: "nvidia/llama-3.1-nemotron-nano-8b-v1:free",
         messages: [{ role: "user", content: prompt }],
       },
       {
         headers: {
-          Authorization: `Bearer ${API_KEYS.OPENCHAT}`,
+          Authorization: `Bearer ${API_KEYS.NVIDIA}`,
           "Content-Type": "application/json",
           "X-Title": "CoAI Chat",
         },
@@ -162,11 +161,11 @@ export const queryOpenchat = async (prompt) => {
     return response.data.choices[0].message.content;
   } catch (error) {
     console.error(
-      "OpenChat 3.5 7B Error:",
+      "Nvidia Error:",
       error.response?.status,
       error.response?.data || error.message
     );
-    return "Sorry, OpenChat couldn't respond at the moment. Please try again later.";
+    return "Sorry, Nvidia couldn't respond at the moment. Please try again later.";
   }
 };
 

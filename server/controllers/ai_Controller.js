@@ -6,7 +6,7 @@ import {
   queryQwen,
   queryMistral,
   queryMeta,
-  queryOpenchat,
+  queryNvidia,
   mergeResponses,
 } from "../services/ai_Services.js";
 
@@ -30,7 +30,9 @@ export const AIResponseController = async (req, res) => {
       where: { name: aiServicePreference },
     });
 
+    console.log(`Ai service found from supabase table: ${aiServicePreference}`)
     if (!aiService) {
+      console.error(`AI Service not found in database`);
       return res.status(404).json({ error: "AI Service not found in database" });
     }
 
@@ -59,12 +61,12 @@ export const AIResponseController = async (req, res) => {
       case "Meta":
         aiResponse = await queryMeta(message);
         break;
-      case "Openchat":
-        aiResponse = await queryOpenchat(message);
+      case "Nvidia":
+        aiResponse = await queryNvidia(message);
         break;
       case "All in one Fusion":
         const aiResults = await Promise.allSettled([
-          queryOpenchat(message),
+          queryNvidia(message),
           queryDeepseek(message),
           queryGemini(message),
           queryMistral(message),
