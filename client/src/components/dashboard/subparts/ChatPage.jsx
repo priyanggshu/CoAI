@@ -711,10 +711,9 @@ const ChatPage = () => {
             transition={{ duration: 0.5 }}
             className={`relative bg-white backdrop-blur-sm shadow-lg rounded-2xl border transition-all duration-300 ${
               isMessageInputFocused
-                ? `border-2 border-${selectedService.color.replace(
-                    "text-",
-                    ""
-                  )}`
+                ? `border-2 border-${
+                    selectedService?.color?.replace("text-", "") || "gray-300"
+                  }`
                 : "border-white"
             }`}
           >
