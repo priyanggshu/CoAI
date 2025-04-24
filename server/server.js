@@ -7,6 +7,8 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import { createServer } from "http";
 import { Server as SocketServer } from "socket.io";
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
 import aiRoutes from "./routes/aiRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -67,6 +69,15 @@ server.use("/auth", authRoutes);
 server.use("/chat", chatRoutes);
 server.use("/ai", aiRoutes);
 server.use("/assist", assistRoutes);
+
+server.get("/health/db", async (req, res) => {
+  try {
+    await prisma.user.findFirst();
+    res.send("Database connected!");
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 
 
 // webtrc
