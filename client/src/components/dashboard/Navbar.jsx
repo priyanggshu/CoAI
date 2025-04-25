@@ -11,7 +11,7 @@ import {
   FaBars,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const navItems = [
   { id: "chat", label: "Chat", icon: IoMdChatbubbles },

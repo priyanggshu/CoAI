@@ -84,7 +84,7 @@ server.get("/health/db", async (req, res) => {
 io.on("connection", socket => {
   console.log("🔌 New socket connection:", socket.id);
 
-  socket.on("join-room", roomId => {
+  socket.on("join-room", (roomId) => {
     socket.join(roomId);
     socket.to(roomId).emit("user-joined", socket.id);
   });
@@ -93,7 +93,9 @@ io.on("connection", socket => {
     io.to(to).emit("signal", { from: socket.id, signal });
   });  
 
-  socket.on("disconnect", () => {
+  socket.on("leave-room", (roomId) => {
+    socket.leave(roomId);
+    socket.to(roomId).emit("User-left");
     console.log("User disconnected:", socket.id);
   });
 });

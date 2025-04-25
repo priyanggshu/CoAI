@@ -488,7 +488,7 @@ const FluidCollaboratePage = ({ roomId }) => {
                       : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
-                  Call
+                  Collab
                 </button>
                 <button
                   onClick={() => setShowUserPanel((prev) => !prev)}
@@ -502,7 +502,7 @@ const FluidCollaboratePage = ({ roomId }) => {
               <div className="h-[66vh]">
                 {activeSidePanel === "chat" && <ChatPanel />}
                 {activeSidePanel === "notes" && <SharedNotes />}
-                {activeSidePanel === "collab" && <VideoCall roomId={roomId}/>}
+                {activeSidePanel === "collab" && <VideoCall />}
               </div>
             </div>
           </div>
@@ -519,7 +519,7 @@ const FluidCollaboratePage = ({ roomId }) => {
                 <div className="h-[calc(100vh-160px)]">
                   {activeSidePanel === "chat" && <ChatPanel />}
                   {activeSidePanel === "notes" && <SharedNotes />}
-                  {activeSidePanel === "collab" && <VideoCall roomId={roomId}/>}
+                  {activeSidePanel === "collab" && <VideoCall />}
                 </div>
               )
             )}
@@ -534,7 +534,7 @@ const FluidCollaboratePage = ({ roomId }) => {
             <div className="w-1/2 h-[45vh]">
               {activeSidePanel === "chat" && <ChatPanel />}
               {activeSidePanel === "notes" && <SharedNotes />}
-              {activeSidePanel === "collab" && <VideoCall roomId={roomId}/>}
+              {activeSidePanel === "collab" && <VideoCall />}
             </div>
           </div>
         ) : (
@@ -575,7 +575,7 @@ const FluidCollaboratePage = ({ roomId }) => {
                       : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
-                  Call
+                  Collab
                 </button>
 
                 {/* Layout Toggle Button for Mobile */}
@@ -599,7 +599,7 @@ const FluidCollaboratePage = ({ roomId }) => {
 
               {activeSidePanel === "chat" && <ChatPanel />}
               {activeSidePanel === "notes" && <SharedNotes />}
-              {activeSidePanel === "collab" && <VideoCall roomId={roomId}/>}
+              {activeSidePanel === "collab" && <VideoCall />}
             </div>
           </div>
         )}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ChevronRight, ChevronLeft, ExternalLink } from "lucide-react";
 import ChatPage from "./subparts/ChatPage";
 import VoicePage from "./subparts/VoicePage";
@@ -19,9 +19,6 @@ const DashBody = ({ activePage, setActivePage, roomId }) => {
   // Update page stack when active page changes from navbar
   useEffect(() => {
     if (!isAnimating) {
-      const currentIndex = pageStack.findIndex(
-        (page) => page.id === activePage
-      );
       const newStack = [...pageStack].map((page) => ({
         ...page,
         active: page.id === activePage,
