@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { signInWithGoogle } from "../redux/slices/authSlice";
+import { useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import Overview from "../components/landing/Overview";
 import Features from "../components/landing/Features";
@@ -13,8 +12,8 @@ import Navbar from "../components/landing/Navbar";
 const LandingPage = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
@@ -26,10 +25,10 @@ const LandingPage = () => {
   }, []);
 
   useEffect(() => {
-    if (user) {
+    if (user && location.pathname !== "/dashboard") {
       navigate("/dashboard");
     }
-  }, [user, navigate]);
+  }, [user, location, navigate]);
 
   return (
     <div className="min-h-screen bg-[url('./assets/landing.png')]">

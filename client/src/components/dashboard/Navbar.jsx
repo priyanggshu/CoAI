@@ -11,6 +11,7 @@ import {
   FaBars,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const navItems = [
   { id: "chat", label: "Chat", icon: IoMdChatbubbles },
@@ -31,6 +32,7 @@ const Navbar = ({ activePage, setActivePage }) => {
   const [darkMode, setDarkMode] = useState(false);
   const dropdownRef = useRef(null);
   const mobileMenuRef = useRef(null);
+  const navigate = useNavigate();
   const [scrollPosition, setScrollPosition] = useState(0);
 
   useEffect(() => {
@@ -73,6 +75,7 @@ const Navbar = ({ activePage, setActivePage }) => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    navigate('/');
     window.location.reload();
   };
 
