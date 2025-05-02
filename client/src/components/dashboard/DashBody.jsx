@@ -1,20 +1,48 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { ChevronRight, ChevronLeft, ExternalLink } from "lucide-react";
+import { motion, useAnimation, useDragControls } from "framer-motion";
+import { ChevronRight, ChevronLeft, Bookmark, MessageSquare, ChevronUp, ChevronDown } from "lucide-react";
 import ChatPage from "./subparts/ChatPage";
-import VoicePage from "./subparts/VoicePage";
 import CollaboratePage from "./subparts/CollaboratePage";
 
 const DashBody = ({ activePage, setActivePage, roomId }) => {
   const [pageStack, setPageStack] = useState([
-    { id: "chat", component: ChatPage, active: true },
-    { id: "voice", component: VoicePage, active: false },
-    { id: "collaborate", component: CollaboratePage, active: false },
+    { id: "chat", component: ChatPage, active: true, icon: MessageSquare, label: "Chat" },
+    { id: "collaborate", component: CollaboratePage, active: false, icon: Bookmark, label: "Collaborate" },
   ]);
 
   const [direction, setDirection] = useState(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [expandView, setExpandView] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [dragPosition, setDragPosition] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [navBarPosition, setNavBarPosition] = useState(0);
+  
+  const controls = useAnimation();
+  const dragControls = useDragControls();
+  const navBarControls = useAnimation();
+
+  // Check screen size for responsive design
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+    };
+  }, []);
+  
+  // Handle navigation bar Y-position changes
+  const handleNavBarDrag = (_, info) => {
+    setNavBarPosition(info.offset.y);
+    
+    // Update navigation bar position using animation controls
+    navBarControls.start({ y: info.offset.y });
+  };
 
   // Update page stack when active page changes from navbar
   useEffect(() => {
@@ -27,13 +55,20 @@ const DashBody = ({ activePage, setActivePage, roomId }) => {
     }
   }, [activePage]);
 
-  const handleNext = () => {
+  const handlePageChange = (direction) => {
     if (isAnimating) return;
 
     const currentIndex = pageStack.findIndex((page) => page.active);
-    const nextIndex = (currentIndex + 1) % pageStack.length;
+    let nextIndex;
+    
+    if (direction === "next") {
+      nextIndex = (currentIndex + 1) % pageStack.length;
+      setDirection("right");
+    } else {
+      nextIndex = (currentIndex - 1 + pageStack.length) % pageStack.length;
+      setDirection("left");
+    }
 
-    setDirection("right");
     setIsAnimating(true);
 
     // Update activePage in parent component
@@ -44,29 +79,6 @@ const DashBody = ({ activePage, setActivePage, roomId }) => {
       const newStack = [...pageStack];
       newStack.forEach((page, i) => {
         page.active = i === nextIndex;
-      });
-      setPageStack(newStack);
-      setIsAnimating(false);
-    }, 500);
-  };
-
-  const handlePrev = () => {
-    if (isAnimating) return;
-
-    const currentIndex = pageStack.findIndex((page) => page.active);
-    const prevIndex = (currentIndex - 1 + pageStack.length) % pageStack.length;
-
-    setDirection("left");
-    setIsAnimating(true);
-
-    // Update activePage in parent component
-    setActivePage(pageStack[prevIndex].id);
-
-    // Apply active state after animation completes
-    setTimeout(() => {
-      const newStack = [...pageStack];
-      newStack.forEach((page, i) => {
-        page.active = i === prevIndex;
       });
       setPageStack(newStack);
       setIsAnimating(false);
@@ -152,16 +164,119 @@ const DashBody = ({ activePage, setActivePage, roomId }) => {
     return "behind";
   };
 
+  // Handle vertical drag for mobile
+  const handleVerticalDrag = (_, info) => {
+    setIsDragging(true);
+    setDragPosition(info.offset.y);
+    
+    // Ensure the drag stays within bounds
+    const maxDrag = 200; // Maximum amount the component can be dragged down
+    if (info.offset.y > maxDrag) {
+      controls.start({ y: maxDrag });
+    } else if (info.offset.y < 0) {
+      controls.start({ y: 0 });
+    } else {
+      controls.start({ y: info.offset.y });
+    }
+  };
+
+  const handleDragEnd = (_, info) => {
+    setIsDragging(false);
+    
+    // If dragged down significantly, expand the view
+    // Otherwise, snap back to original position
+    if (info.offset.y > 100) {
+      setExpandView(true);
+      controls.start({ y: 0 });
+    } else {
+      setExpandView(false);
+      controls.start({ y: 0, transition: { type: "spring", stiffness: 400, damping: 40 } });
+    }
+    
+    setDragPosition(0);
+  };
+
+  const activeIndex = pageStack.findIndex(page => page.active);
+  const prevPageIndex = (activeIndex - 1 + pageStack.length) % pageStack.length;
+  const nextPageIndex = (activeIndex + 1) % pageStack.length;
+
   return (
-    <section
+    <motion.section
       className={`relative bg-gradient-to-b from-gray-100 to-gray-200 overflow-hidden h-screen ${
         expandView ? "rounded-none" : "rounded-t-3xl sm:rounded-t-4xl"
       } shadow-xl`}
+      animate={controls}
+      dragControls={dragControls}
+      drag={isMobile ? "y" : false}
+      dragConstraints={{ top: 0, bottom: 200 }}
+      dragElastic={0.2}
+      onDrag={handleVerticalDrag}
+      onDragEnd={handleDragEnd}
+      style={{ touchAction: isMobile ? "pan-y" : "auto" }}
     >
       <div className="absolute inset-0 bg-white bg-opacity-40 backdrop-blur-sm z-0"></div>
 
+      {/* Drag indicator for mobile */}
+      {isMobile && (
+        <div className="absolute top-2 left-0 right-0 flex justify-center z-30 pointer-events-none">
+          <div className="w-12 h-1 bg-gray-400 rounded-full opacity-70"></div>
+        </div>
+      )}
+
       {/* The card container with 3D perspective */}
       <div className="relative h-full w-full perspective-1000">
+        {/* Side navigation buttons - visible on desktop */}
+        {!isMobile && (
+          <>
+            {/* Left navigation button */}
+            <motion.button
+              onClick={() => handlePageChange("prev")}
+              className="absolute left-0 top-1/2 z-20 transform -translate-y-1/2 bg-white bg-opacity-70 hover:bg-opacity-90 p-4 pl-2 pr-3 rounded-r-xl shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              whileHover={{ x: 5, boxShadow: "0 10px 25px rgba(0, 0, 0, 0.1)" }}
+              whileTap={{ scale: 0.95 }}
+              aria-label={`Go to ${pageStack[prevPageIndex].label}`}
+            >
+              <div className="flex flex-col items-center">
+                <ChevronLeft size={24} className="text-gray-700" />
+                <span className="text-xs font-medium text-gray-600 mt-1">
+                  {pageStack[prevPageIndex].label}
+                </span>
+              </div>
+            </motion.button>
+
+            {/* Right navigation button */}
+            <motion.button
+              onClick={() => handlePageChange("next")}
+              className="absolute right-0 top-1/2 z-20 transform -translate-y-1/2 bg-white bg-opacity-70 hover:bg-opacity-90 p-4 pr-2 pl-3 rounded-l-xl shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              whileHover={{ x: -5, boxShadow: "0 10px 25px rgba(0, 0, 0, 0.1)" }}
+              whileTap={{ scale: 0.95 }}
+              aria-label={`Go to ${pageStack[nextPageIndex].label}`}
+            >
+              <div className="flex flex-col items-center">
+                <ChevronRight size={24} className="text-gray-700" />
+                <span className="text-xs font-medium text-gray-600 mt-1">
+                  {pageStack[nextPageIndex].label}
+                </span>
+              </div>
+            </motion.button>
+          </>
+        )}
+
+        {/* Vertical navigation indicators (only on mobile) */}
+        {isMobile && isDragging && (
+          <motion.div 
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center justify-center gap-3 pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: dragPosition > 50 ? 0.8 : 0 }}
+          >
+            <ChevronUp size={32} className="text-indigo-600" />
+            <span className="text-indigo-700 font-medium">
+              {dragPosition > 100 ? "Release to expand" : "Drag to expand"}
+            </span>
+            <ChevronDown size={32} className="text-indigo-600" />
+          </motion.div>
+        )}
+
         {pageStack.map((page, index) => {
           const PageComponent = page.component;
 
@@ -201,54 +316,108 @@ const DashBody = ({ activePage, setActivePage, roomId }) => {
         })}
       </div>
 
-      {/* Navigation arrows */}
-      <div className="absolute bottom-6 right-6 z-20 flex items-center gap-2">
-        <motion.button
-          onClick={handlePrev}
-          className="bg-white bg-opacity-80 backdrop-blur-md p-3 rounded-full shadow-lg hover:bg-opacity-100 transition-all"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <ChevronLeft size={20} className="text-gray-700" />
-        </motion.button>
-
-        <motion.button
-          onClick={handleNext}
-          className="bg-indigo-600 p-3 rounded-full shadow-lg hover:bg-indigo-700 transition-all"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <ChevronRight size={20} className="text-white" />
-        </motion.button>
-      </div>
-
-      {/* Page indicators */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20">
-        <div className="flex space-x-2">
-          {pageStack.map((page) => (
-            <motion.div
+      {/* Bottom navigation for mobile */}
+      <motion.div 
+        className="fixed left-1/2 transform -translate-x-1/2 z-30 flex flex-col items-center"
+        initial={{ y: 20, opacity: 0, bottom: 16 }}
+        animate={{ opacity: 1, bottom: 16 }}
+        transition={{ delay: 0.2 }}
+        drag={isMobile ? "y" : false}
+        dragConstraints={{ top: -200, bottom: 200 }}
+        dragElastic={0.2}
+        dragMomentum={false}
+        style={{ touchAction: "none" }}
+      >
+        {/* Drag handle above mobile nav */}
+        {isMobile && (
+          <motion.div 
+            className="w-10 h-1 bg-gray-300 rounded-full mb-2 cursor-grab active:cursor-grabbing"
+            whileHover={{ backgroundColor: "#6366F1", width: 40 }}
+          />
+        )}
+        
+        {/* Page dots indicator */}
+        <div className="flex space-x-2 mb-3">
+          {pageStack.map((page, index) => (
+            <motion.button
               key={page.id}
-              className={`w-2 h-2 rounded-full ${
-                page.active ? "bg-indigo-600 w-6" : "bg-gray-400"
-              } transition-all`}
+              onClick={() => {
+                if (page.active) return;
+                setDirection(index > activeIndex ? "right" : "left");
+                setActivePage(page.id);
+              }}
+              className={`h-2 rounded-full transition-all focus:outline-none ${
+                page.active ? "bg-indigo-600" : "bg-gray-400 hover:bg-gray-600"
+              }`}
               animate={{ width: page.active ? 24 : 8 }}
-              transition={{ duration: 0.3 }}
+              whileHover={{ scale: 1.2 }}
+              aria-label={`Go to ${page.label} page`}
+              aria-current={page.active ? "page" : undefined}
             />
           ))}
         </div>
-      </div>
 
-      {/* Expand/collapse button */}
-      <button
-        onClick={() => setExpandView(!expandView)}
-        className="absolute top-4 right-4 z-20 p-2 rounded-full bg-white bg-opacity-70 backdrop-blur-sm hover:bg-opacity-100 transition-all"
+        {/* Mobile navigation buttons */}
+        {isMobile && (
+          <div className="flex items-center bg-indigo-600 bg-opacity-90 backdrop-blur-md rounded-full shadow-lg p-1">
+            <motion.button
+              onClick={() => handlePageChange("prev")}
+              className="p-3 rounded-l-full hover:bg-indigo-700 transition-all focus:outline-none focus:ring-2 focus:ring-white"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              aria-label={`Go to ${pageStack[prevPageIndex].label}`}
+            >
+              <ChevronLeft size={20} className="text-white" />
+            </motion.button>
+            
+            <div className="px-3 text-white text-sm font-medium">
+              {pageStack[activeIndex].label}
+            </div>
+
+            <motion.button
+              onClick={() => handlePageChange("next")}
+              className="p-3 rounded-r-full hover:bg-indigo-700 transition-all focus:outline-none focus:ring-2 focus:ring-white"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              aria-label={`Go to ${pageStack[nextPageIndex].label}`}
+            >
+              <ChevronRight size={20} className="text-white" />
+            </motion.button>
+          </div>
+        )}
+      </motion.div>
+
+      {/* Initial guidance - shows on first render */}
+      <motion.div
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 text-gray-500 pointer-events-none"
+        initial={{ opacity: 0.7 }}
+        animate={{ opacity: 0 }}
+        transition={{ delay: 1, duration: 2 }}
       >
-        <ExternalLink
-          size={16}
-          className={`transition-transform ${expandView ? "rotate-180" : ""}`}
-        />
-      </button>
-    </section>
+        <div className="flex flex-col items-center gap-4">
+          {isMobile ? (
+            <>
+              <div className="flex items-center gap-2">
+                <ChevronLeft size={24} />
+                <span className="text-base font-medium">Swipe to navigate</span>
+                <ChevronRight size={24} />
+              </div>
+              <div className="flex items-center gap-2 mt-2">
+                <ChevronUp size={24} />
+                <span className="text-base font-medium">Drag to expand</span>
+                <ChevronDown size={24} />
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center gap-4">
+              <ChevronLeft size={32} />
+              <span className="text-lg font-medium">Swipe to navigate</span>
+              <ChevronRight size={32} />
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </motion.section>
   );
 };
 

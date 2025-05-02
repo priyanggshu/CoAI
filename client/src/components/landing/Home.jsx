@@ -20,7 +20,7 @@ const Home = ({ setAuthDialogOpen, authDialogOpen }) => {
           authDialogOpen={authDialogOpen}
         />
 
-        <h1 className="text-5xl font-Krona md:text-6xl font-bold mt-8 mb-8 bg-gradient-to-r from-gray-500/15 md:from-black/25 via-indigo-400 md:to-black/20 to-gray-500/15 bg-clip-text text-transparent leading-tight">
+        <h1 className="text-5xl font-Krona md:text-6xl font-bold mt-8 mb-8 bg-gradient-to-r from-indigo-400/40 md:from-black/75 via-indigo-400 md:via-indigo-400 md:to-black/75 to-indigo-400/40 bg-clip-text text-transparent leading-tight">
           Unleash the Power of
           <br />
           <span className="bg-gradient-to-r from-gray-200/60 via-yellow-500/80 to-gray-200/60 bg-clip-text text-transparent leading-tight">

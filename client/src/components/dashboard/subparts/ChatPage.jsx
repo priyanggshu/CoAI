@@ -1,14 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import {
-  FiCornerRightUp,
-  FiClock,
-  FiCommand,
-  FiMaximize2,
-  FiMinimize2,
-} from "react-icons/fi";
+import { FiCornerRightUp, FiClock, FiCommand, FiMaximize2, FiMinimize2 } from "react-icons/fi";
 import { HiMiniPencilSquare } from "react-icons/hi2";
-import { SlMagicWand } from "react-icons/sl";
 import { RiGeminiFill } from "react-icons/ri";
 import { FaMagic } from "react-icons/fa";
 import { GiSpermWhale, GiFrozenBlock } from "react-icons/gi";
@@ -565,217 +558,191 @@ const ChatPage = () => {
       </AnimatePresence>
 
       {/* Chat container */}
-      <div
-        className={`flex-1 mx-auto px-4 overflow-hidden flex flex-col transition-all duration-500 ${
-          fullWidth ? "w-full max-w-6xl" : "w-full max-w-5xl"
-        }`}
-      >
-        {/* Chat messages area */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar pr-2">
+<div
+  className={`flex-1 mx-auto px-2 sm:px-4 overflow-hidden flex flex-col transition-all duration-500 ${
+    fullWidth ? "w-full max-w-6xl" : "w-full max-w-5xl"
+  }`}
+>
+  {/* Chat messages area */}
+  <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 sm:pr-2">
+    <motion.div
+      className="space-y-6 sm:space-y-8 pb-4 pt-2"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {currentChat.length === 0 ? (
+        <motion.div
+          className="flex flex-col items-center justify-center h-full py-12 sm:py-20"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
           <motion.div
-            className="space-y-8 pb-4 pt-2"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
+            className={`bg-gradient-to-br ${selectedService.gradient} text-white p-4 sm:p-6 rounded-full mb-4 sm:mb-6 shadow-lg`}
+            animate={{
+              y: [0, -10, 0],
+              boxShadow: [
+                "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+                "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+              ],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
           >
-            {currentChat.length === 0 ? (
-              <motion.div
-                className="flex flex-col items-center justify-center h-full py-20"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-              >
+            {React.createElement(selectedService.icon, {
+              className: "size-8 sm:size-12",
+            })}
+          </motion.div>
+          <h3 className="text-xl sm:text-2xl font-Montserrat font-semibold text-gray-800 mb-2 sm:mb-3 text-center">
+            Start chatting with {aiPreference}
+          </h3>
+          <p className="text-gray-500 font-Montserrat text-center text-sm sm:text-base max-w-xs sm:max-w-md px-4">
+            Ask any question and get intelligent answers from the AI assistant
+          </p>
+        </motion.div>
+      ) : (
+        currentChat.map((entry, index) => (
+          <div key={index} className="space-y-3 sm:space-y-4">
+            <motion.div
+              variants={itemVariants}
+              className="flex justify-end"
+            >
+              <div className="flex flex-col items-end max-w-[85%] sm:max-w-2xl">
+                <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white p-3 sm:p-4 rounded-2xl rounded-tr-none shadow-sm">
+                  <p className="text-sm break-words">{entry.query}</p>
+                </div>
+                <span className="text-xs text-gray-400 mt-1 mr-2">
+                  {formatTime(entry.timestamp)}
+                </span>
+              </div>
+            </motion.div>
+
+            <motion.div variants={itemVariants} className="flex">
+              <div className="mr-2 mt-1 flex-shrink-0">
                 <motion.div
-                  className={`bg-gradient-to-br ${selectedService.gradient} text-white p-6 rounded-full mb-6 shadow-lg`}
-                  animate={{
-                    y: [0, -10, 0],
-                    boxShadow: [
-                      "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-                      "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-                      "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-                    ],
-                  }}
-                  transition={{
-                    duration: 4,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
+                  className={`size-7 sm:size-8 rounded-full flex items-center justify-center bg-gradient-to-br ${selectedService.gradient} shadow-sm`}
+                  whileHover={{ scale: 1.1, rotate: 5 }}
                 >
                   {React.createElement(selectedService.icon, {
-                    className: "size-12",
+                    className: "size-4 sm:size-5 text-white",
                   })}
                 </motion.div>
-                <h3 className="text-2xl font-medium text-gray-800 mb-3">
-                  Start chatting with {aiPreference}
-                </h3>
-                <p className="text-gray-500 text-center max-w-md">
-                  Ask any question and get intelligent answers from the AI
-                  assistant
-                </p>
-                <motion.div
-                  className="mt-8 flex items-center"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 1 }}
-                >
-                  <motion.div
-                    className="text-xs bg-indigo-100 text-indigo-700 px-3 py-2 rounded-lg mr-2"
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    "Tell me about quantum computing"
-                  </motion.div>
-                  <motion.div
-                    className="text-xs bg-indigo-100 text-indigo-700 px-3 py-2 rounded-lg mr-2"
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    "Write a poem about stars"
-                  </motion.div>
-                  <motion.div
-                    className="text-xs bg-indigo-100 text-indigo-700 px-3 py-2 rounded-lg"
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    "Help me solve this math problem"
-                  </motion.div>
-                </motion.div>
-              </motion.div>
-            ) : (
-              currentChat.map((entry, index) => (
-                <div key={index} className="space-y-4">
-                  <motion.div
-                    variants={itemVariants}
-                    className="flex justify-end"
-                  >
-                    <div className="flex flex-col items-end">
-                      <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white p-4 rounded-2xl rounded-tr-none max-w-2xl shadow-sm">
-                        <p className="text-sm">{entry.query}</p>
-                      </div>
-                      <span className="text-xs text-gray-400 mt-1 mr-2">
-                        {formatTime(entry.timestamp)}
+              </div>
+              <div className="flex flex-col max-w-[85%] sm:max-w-3xl">
+                <div className="bg-white rounded-2xl rounded-tl-none p-3 sm:p-4 shadow-sm">
+                  <div className="flex items-center gap-2 mb-1 sm:mb-2">
+                    <span className="font-medium text-xs sm:text-sm text-gray-700">
+                      {aiPreference}
+                    </span>
+                    {entry.cached && (
+                      <span className="text-xs text-purple-600 px-2 py-0.5 bg-purple-50 rounded-full">
+                        cached
                       </span>
-                    </div>
-                  </motion.div>
-
-                  <motion.div variants={itemVariants} className="flex">
-                    <div className="mr-2 mt-1">
-                      <motion.div
-                        className={`size-8 rounded-full flex items-center justify-center bg-gradient-to-br ${selectedService.gradient} shadow-sm`}
-                        whileHover={{ scale: 1.1, rotate: 5 }}
-                      >
-                        {React.createElement(selectedService.icon, {
-                          className: "size-5 text-white",
-                        })}
-                      </motion.div>
-                    </div>
-                    <div className="flex flex-col">
-                      <div className="bg-white rounded-2xl rounded-tl-none p-4 max-w-3xl shadow-sm">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="font-medium text-sm text-gray-700">
-                            {aiPreference}
-                          </span>
-                          {entry.cached && (
-                            <span className="text-xs text-purple-600 px-2 py-0.5 bg-purple-50 rounded-full">
-                              cached
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-sm whitespace-pre-line text-gray-800">
-                          {typingEffect && index === currentChat.length - 1
-                            ? currentTypingMessage
-                            : entry.answer}
-                          {typingEffect && index === currentChat.length - 1 && (
-                            <motion.span
-                              animate={{ opacity: [1, 0, 1] }}
-                              transition={{ duration: 1, repeat: Infinity }}
-                              className="inline-block ml-1 w-2 h-4 bg-gray-400"
-                            />
-                          )}
-                        </p>
-                      </div>
-                      <span className="text-xs text-gray-400 mt-1 ml-2">
-                        {formatTime(entry.timestamp)}
-                      </span>
-                    </div>
-                  </motion.div>
+                    )}
+                  </div>
+                  <p className="text-sm whitespace-pre-line text-gray-800 break-words">
+                    {typingEffect && index === currentChat.length - 1
+                      ? currentTypingMessage
+                      : entry.answer}
+                    {typingEffect && index === currentChat.length - 1 && (
+                      <motion.span
+                        animate={{ opacity: [1, 0, 1] }}
+                        transition={{ duration: 1, repeat: Infinity }}
+                        className="inline-block ml-1 w-1.5 sm:w-2 h-3 sm:h-4 bg-gray-400"
+                      />
+                    )}
+                  </p>
                 </div>
-              ))
-            )}
-            <div ref={chatEndRef} />
-          </motion.div>
-        </div>
-
-        {/* Input area */}
-        <div className="sticky bottom-4 w-full pb-2">
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className={`relative bg-white backdrop-blur-sm shadow-lg rounded-2xl border transition-all duration-300 ${
-              isMessageInputFocused
-                ? `border-2 border-${
-                    selectedService?.color?.replace("text-", "") || "gray-300"
-                  }`
-                : "border-white"
-            }`}
-          >
-            <textarea
-              ref={textareaRef}
-              rows="1"
-              placeholder={`Ask ${aiPreference}...`}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onFocus={() => setIsMessageInputFocused(true)}
-              onBlur={() => setIsMessageInputFocused(false)}
-              className="w-full bg-transparent p-4 pr-14 resize-none focus:outline-none text-gray-800 placeholder:text-gray-400 min-h-[56px] max-h-[120px] custom-scrollbar"
-            />
-            <motion.div
-              className="absolute bottom-3 right-3"
-              whileHover={{ scale: 1.05 }}
-            >
-              <motion.button
-                onClick={handleSend}
-                disabled={loading || !message.trim()}
-                className={`p-2 rounded-full shadow-sm transition-all duration-300 ${
-                  loading || !message.trim()
-                    ? "bg-gray-100 text-gray-400"
-                    : `bg-gradient-to-r ${selectedService.gradient} text-white hover:shadow`
-                }`}
-                whileTap={{ scale: 0.9 }}
-                animate={
-                  !loading && message.trim() ? { scale: [1, 1.05, 1] } : {}
-                }
-                transition={{
-                  duration: 2,
-                  repeat: !loading && message.trim() ? Infinity : 0,
-                  ease: "easeInOut",
-                }}
-              >
-                {loading ? (
-                  <motion.div
-                    className="size-6 border-2 border-t-transparent border-white rounded-full"
-                    animate={{ rotate: 360 }}
-                    transition={{
-                      duration: 1,
-                      repeat: Infinity,
-                      ease: "linear",
-                    }}
-                  />
-                ) : (
-                  <FiCornerRightUp className="size-6" />
-                )}
-              </motion.button>
+                <span className="text-xs text-gray-400 mt-1 ml-2">
+                  {formatTime(entry.timestamp)}
+                </span>
+              </div>
             </motion.div>
-          </motion.div>
-          <motion.p
-            className="text-xs text-center text-gray-500 mt-2"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            Press Enter to send, Shift+Enter for new line
-          </motion.p>
-        </div>
-      </div>
+          </div>
+        ))
+      )}
+      <div ref={chatEndRef} />
+    </motion.div>
+  </div>
+
+  {/* Input area */}
+  <div className="sticky bottom-2 sm:bottom-4 w-full pb-1 sm:pb-2">
+    <motion.div
+      initial={{ y: 20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className={`relative bg-white backdrop-blur-sm shadow-lg rounded-xl sm:rounded-2xl border transition-all duration-300 ${
+        isMessageInputFocused
+          ? `border-2 border-${
+              selectedService?.color?.replace("text-", "") || "gray-300"
+            }`
+          : "border-white"
+      }`}
+    >
+      <textarea
+        ref={textareaRef}
+        rows="1"
+        placeholder={`Ask ${aiPreference}...`}
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyDown={handleKeyDown}
+        onFocus={() => setIsMessageInputFocused(true)}
+        onBlur={() => setIsMessageInputFocused(false)}
+        className="w-full bg-transparent p-3 sm:p-4 pr-12 sm:pr-14 resize-none focus:outline-none text-gray-800 placeholder:text-gray-400 min-h-[50px] sm:min-h-[56px] max-h-[120px] custom-scrollbar text-sm sm:text-base"
+      />
+      <motion.div
+        className="absolute bottom-2 sm:bottom-3 right-2 sm:right-3"
+        whileHover={{ scale: 1.05 }}
+      >
+        <motion.button
+          onClick={handleSend}
+          disabled={loading || !message.trim()}
+          className={`p-2 rounded-full shadow-sm transition-all duration-300 ${
+            loading || !message.trim()
+              ? "bg-gray-100 text-gray-400"
+              : `bg-gradient-to-r ${selectedService.gradient} text-white hover:shadow`
+          }`}
+          whileTap={{ scale: 0.9 }}
+          animate={
+            !loading && message.trim() ? { scale: [1, 1.05, 1] } : {}
+          }
+          transition={{
+            duration: 2,
+            repeat: !loading && message.trim() ? Infinity : 0,
+            ease: "easeInOut",
+          }}
+        >
+          {loading ? (
+            <motion.div
+              className="size-5 sm:size-6 border-2 border-t-transparent border-white rounded-full"
+              animate={{ rotate: 360 }}
+              transition={{
+                duration: 1,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+            />
+          ) : (
+            <FiCornerRightUp className="size-5 sm:size-6" />
+          )}
+        </motion.button>
+      </motion.div>
+    </motion.div>
+    <motion.p
+      className="text-xs text-center text-gray-500 mt-1 sm:mt-2"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.5 }}
+    >
+      Press Enter to send, Shift+Enter for new line
+    </motion.p>
+  </div>
+</div>
 
       {/* Custom Scrollbar Style */}
       <style jsx global>{`

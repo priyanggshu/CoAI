@@ -15,12 +15,6 @@ import { useNavigate } from "react-router-dom";
 
 const navItems = [
   { id: "chat", label: "Chat", icon: IoMdChatbubbles },
-  {
-    id: "voice",
-    label: "Voice",
-    icon: RiChatVoiceAiLine,
-    activeIcon: RiChatVoiceAiFill,
-  },
   { id: "collaborate", label: "Collaborate", icon: PiDevicesFill },
 ];
 
