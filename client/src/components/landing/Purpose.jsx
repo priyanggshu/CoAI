@@ -8,10 +8,10 @@ const Purpose = () => {
   return (
     <section className=" bg-gradient-to-b from-black/60 to-black/60 pb-12 relative">
       <div className="container mx-auto px-6 relative z-10 text-center">
-        <h2 className="font-Syne text-4xl md:text-5xl font-bold bg-gradient-to-r from-transparent via-indigo-200 to-transparent bg-clip-text text-transparent mb-6">
+        <h2 className="font-Syne text-4xl md:text-5xl font-bold bg-gradient-to-r from-transparent via-indigo-200 to-transparent bg-clip-text text-transparent mb-8">
           Why Choose CoAI?
         </h2>
-        <p className="font-Syne text-lg text-gray-500 max-w-3xl mx-auto mb-12">
+        <p className="font-Alt md:text-lg text-gray-400 max-w-3xl mx-auto mb-12">
           A seamless AI experience that integrates top models, real-time
           collaboration, and cutting-edge tools—built for teams, developers, and
           AI enthusiasts.

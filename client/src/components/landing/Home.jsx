@@ -8,7 +8,7 @@ const Home = ({ setAuthDialogOpen, authDialogOpen }) => {
       <div className="absolute inset-0 bg-transparent backdrop-blur-[3px]"></div>
       <div className="absolute -top-1/2 left-1/2 w-[800px] h-[800px] bg-indigo-500/15 rounded-full blur-3xl transform -translate-x-1/2 animate-pulse"></div>
       <div className="container mx-auto text-center relative z-10">
-        <div className="inline-flex items-center px-4 py-1.5 bg-[#1A142F]/50 rounded-full text-white/80 text-sm mb-10 border border-gray-600 backdrop-blur-sm hover:bg-[#FF8F6B]/10 transition-all duration-300">
+        <div className="inline-flex items-center px-4 py-1.5 bg-[#1A142F]/50 rounded-full font-Alt text-white/80 text-sm mb-10 border border-gray-600 backdrop-blur-sm hover:bg-[#FF8F6B]/10 transition-all duration-300">
           <span className="animate-pulse mr-2">✨</span>
           The Future of AI Collaboration
           <span className="animate-pulse ml-2">✨</span>
@@ -20,17 +20,16 @@ const Home = ({ setAuthDialogOpen, authDialogOpen }) => {
           authDialogOpen={authDialogOpen}
         />
 
-        <h1 className="text-5xl font-Krona md:text-6xl font-bold mt-8 mb-8 bg-gradient-to-r from-black/30 md:from-black via-indigo-400 md:to-black to-black/30 bg-clip-text text-transparent leading-tight">
+        <h1 className="text-5xl font-Krona md:text-6xl font-bold mt-8 mb-8 bg-gradient-to-r from-gray-500/15 md:from-black/25 via-indigo-400 md:to-black/20 to-gray-500/15 bg-clip-text text-transparent leading-tight">
           Unleash the Power of
           <br />
           <span className="bg-gradient-to-r from-gray-200/60 via-yellow-500/80 to-gray-200/60 bg-clip-text text-transparent leading-tight">
             Multiple AI Minds
           </span>
         </h1>
-        <p className="font-Syne text-xl text-gray-300 max-w-3xl mx-auto mt-10 mb-12 leading-relaxed">
+        <p className="font-Alt md:text-lg text-gray-300 max-w-3xl mx-auto mt-10 mb-12 leading-relaxed">
           Why choose one AI when you can harness them all? Get instant answers
-          from ChatGPT, Gemini, Claude, and more — all in one seamless
-          experience.
+          from Gemini, NVIDIA, Meta and more — all in one seamless experience.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-6 mt-20">
           <button

@@ -6,10 +6,10 @@ const Socials = () => {
   return (
     <section className="py-24 bg-gradient-to-b from-black/70 to-blue-800/5 backdrop-blur-[2px] relative">
       <div className="container mx-auto px-6 relative z-10 text-center">
-        <h2 className="font-dancing font-bold text-3xl md:text-6xl bg-gradient-to-r from-black/90 to-white bg-clip-text text-transparent mb-6">
+        <h2 className="font-dancing font-bold text-3xl md:text-6xl bg-gradient-to-r from-black/5 to-white bg-clip-text text-transparent mb-6">
           Connect With Ps.
         </h2>
-        <p className="font-Krona text-sm text-gray-300 max-w-3xl mx-auto mb-12">
+        <p className="font-Alt text-md text-gray-300 max-w-3xl mx-auto mb-12">
           Stay updated, join the conversation, and be part of the CoAI
           community.
         </p>

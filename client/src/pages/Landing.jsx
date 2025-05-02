@@ -36,19 +36,32 @@ const LandingPage = () => {
       <Navbar isScrolled={isScrolled} setAuthDialogOpen={setAuthDialogOpen} />
 
       {/* Hero Section */}
-      <Home setAuthDialogOpen={setAuthDialogOpen} authDialogOpen={authDialogOpen} />
+      <section id="home">
+        <Home
+          setAuthDialogOpen={setAuthDialogOpen}
+          authDialogOpen={authDialogOpen}
+        />
+      </section>
 
       {/* Overview Section */}
-      <Overview setAuthDialogOpen={setAuthDialogOpen} />
+      <section id="overview">
+        <Overview setAuthDialogOpen={setAuthDialogOpen} />
+      </section>
 
       {/* Features Section */}
-      <Features />
+      <section id="features">
+        <Features />
+      </section>
 
       {/* Why CoAI Section */}
-      <Purpose />
+      <section id="purpose">
+        <Purpose />
+      </section>
 
       {/* Socials Section */}
-      <Socials />
+      <section id="socials">
+        <Socials />
+      </section>
 
       {/* Footer Section */}
       <footer className="py-10 bg-black/60 backdrop-blur-[1px] border-t border-gray-900">

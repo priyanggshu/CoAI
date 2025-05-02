@@ -10,7 +10,7 @@ const Features = () => {
           <h2 className="font-Syne text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-indigo-300 to-indigo-500 bg-clip-text text-transparent">
             Everything You Need in One Place
           </h2>
-          <p className="font-Syne text-lg text-gray-300 max-w-2xl mt-8 mx-auto">
+          <p className="font-Alt md:text-lg text-gray-300 max-w-2xl mt-8 mx-auto">
             A complete AI collaboration platform built for modern teams
           </p>
         </div>

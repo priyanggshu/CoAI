@@ -1,9 +1,10 @@
 import React from "react";
-import { FaBolt } from "react-icons/fa6";
+import { FaMeta } from "react-icons/fa6";
 import { TiGroup } from "react-icons/ti";
-import { AiFillOpenAI } from "react-icons/ai";
-import { SiHuggingface, SiWebrtc } from "react-icons/si";
-import { RiGeminiFill, RiClaudeLine, RiPerplexityLine } from "react-icons/ri";
+import { GiSpermWhale, GiFrozenBlock } from "react-icons/gi";
+import { BsNvidia } from "react-icons/bs";
+import { RiGeminiFill } from "react-icons/ri";
+import { LuShipWheel } from "react-icons/lu";
 
 const Overview = ({setAuthDialogOpen}) => {
   return (
@@ -13,65 +14,53 @@ const Overview = ({setAuthDialogOpen}) => {
         <h2 className="font-Krona text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900/90 via-white/90 to-gray-900/90 bg-clip-text text-transparent my-3">
           Unlock AI & Collaborate in Real-Time
         </h2>
-        <p className="font-Syne text-gray-400 text-xl my-10 max-w-3xl mx-auto">
+        <p className="font-Alt text-gray-400 md:text-lg my-10 max-w-3xl mx-auto">
           CoAI integrates top AI services and allows real-time collaboration
           through WebRTC-powered video calls, voice chats, and shared AI
           workspaces.
         </p>
 
         {/* AI Services & WebRTC Feature Grid */}
-        <div className="mt-24 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-6">
-          {[
-            { name: "ChatGPT", icon: AiFillOpenAI, colour: "text-white" },
-            { name: "Gemini", icon: RiGeminiFill, colour: "text-blue-500" },
-            { name: "Claude", icon: RiClaudeLine, colour: "text-orange-500" },
-            {
-              name: "Perplexity",
-              icon: RiPerplexityLine,
-              colour: "text-gray-200",
-            },
-            { name: "Bolt.new", icon: FaBolt, colour: "text-gray-400" },
-            {
-              name: "Hugging Face",
-              icon: SiHuggingface,
-              colour: "text-yellow-400",
-            },
-            {
-              name: "WebRTC Collaboration",
-              icon: SiWebrtc,
-              colour: "text-green-300",
-              highlight: true,
-            },
-          ].map((service) => (
-            <div key={service.name} className="group cursor-pointer">
-              <div
-                className={`p-4 mx-6  rounded-2xl border flex justify-center transition-all duration-300 ${
-                  service.highlight
-                    ? "border-indigo-500/70 bg-indigo-900/30 hover:bg-indigo-800/40"
-                    : "border-gray-700/50 bg-black/60 hover:bg-black/40"
-                } hover:scale-105`}
-              >
-                {React.createElement(service.icon, {
-                  className: `h-10 w-10 ${service.colour} group-hover:scale-110 transition-colors`,
-                })}
-              </div>
-              <p
-                className={`mt-3 font-Syne text-md transition-colors ${
-                  service.highlight ? "text-indigo-500" : "text-gray-200"
-                } group-hover:text-indigo-400`}
-              >
-                {service.name}
-              </p>
-            </div>
-          ))}
+        <div className="mt-12 sm:mt-16 md:mt-24">
+  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
+    {[
+      { name: "Gemini", icon: RiGeminiFill, colour: "text-blue-500" },
+      { name: "NVIDIA", icon: BsNvidia, colour: "text-green-500" },
+      { name: "Deepseek", icon: GiSpermWhale, colour: "text-blue-500" },
+      { name: "Qwen", icon: LuShipWheel, colour: "text-blue-900" },
+      { name: "Mistral", icon: GiFrozenBlock, colour: "text-orange-600" },
+      { name: "Meta", icon: FaMeta, colour: "text-blue-700" }
+    ].map((service) => (
+      <div key={service.name} className="group cursor-pointer flex flex-col items-center">
+        <div
+          className={`p-3 sm:p-4 w-full max-w-[100px] aspect-square rounded-2xl border flex items-center justify-center transition-all duration-300 ${
+            service.highlight
+              ? "border-indigo-500/70 bg-indigo-900/30 hover:bg-indigo-800/40"
+              : "border-gray-700/50 bg-black/60 hover:bg-black/40"
+          } hover:scale-105`}
+        >
+          {React.createElement(service.icon, {
+            className: `w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 ${service.colour} group-hover:scale-110 transition-colors`,
+          })}
         </div>
+        <p
+          className={`mt-2 sm:mt-3 font-Syne text-xs sm:text-sm md:text-md text-center transition-colors ${
+            service.highlight ? "text-indigo-500" : "text-gray-200"
+          } group-hover:text-indigo-400`}
+        >
+          {service.name}
+        </p>
+      </div>
+    ))}
+  </div>
+</div>
 
         {/* Collaboration Feature Section */}
         <div className="mt-20">
           <h3 className="text-4xl font-Syne font-bold text-white">
             Collaborate & Enhance Your AI Experience
           </h3>
-          <p className="font-Syne text-gray-400 text-xl max-w-3xl mx-auto my-10">
+          <p className="font-Alt text-gray-400 md:text-lg max-w-3xl mx-auto my-10">
             Connect with others via **video calls, voice chats, and shared AI
             workspaces**. CoAI makes AI interactions more **interactive, social,
             and productive**.
