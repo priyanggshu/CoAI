@@ -3,8 +3,14 @@ import { motion, useAnimation, useDragControls } from "framer-motion";
 import { ChevronRight, ChevronLeft, Bookmark, MessageSquare, ChevronUp, ChevronDown } from "lucide-react";
 import ChatPage from "./subparts/ChatPage";
 import CollaboratePage from "./subparts/CollaboratePage";
+import { useSelector } from "react-redux";
+import { selectTheme } from "../../redux/slices/themeSlice";
 
 const DashBody = ({ activePage, setActivePage, roomId }) => {
+  // Get theme from Redux store
+  const theme = useSelector(selectTheme);
+  const isDarkMode = theme === 'dark';
+
   const [pageStack, setPageStack] = useState([
     { id: "chat", component: ChatPage, active: true, icon: MessageSquare, label: "Chat" },
     { id: "collaborate", component: CollaboratePage, active: false, icon: Bookmark, label: "Collaborate" },
@@ -202,9 +208,9 @@ const DashBody = ({ activePage, setActivePage, roomId }) => {
 
   return (
     <motion.section
-      className={`relative bg-gradient-to-b from-gray-100 to-gray-200 overflow-hidden h-screen ${
-        expandView ? "rounded-none" : "rounded-t-3xl sm:rounded-t-4xl"
-      } shadow-xl`}
+      className={`relative ${isDarkMode ? 
+        'bg-gradient-to-b from-gray-900 to-gray-800' : 
+        'bg-gradient-to-b from-gray-100 to-gray-200'} overflow-hidden h-screen shadow-xl`}
       animate={controls}
       dragControls={dragControls}
       drag={isMobile ? "y" : false}
@@ -214,12 +220,14 @@ const DashBody = ({ activePage, setActivePage, roomId }) => {
       onDragEnd={handleDragEnd}
       style={{ touchAction: isMobile ? "pan-y" : "auto" }}
     >
-      <div className="absolute inset-0 bg-white bg-opacity-40 backdrop-blur-sm z-0"></div>
+      <div className={`absolute inset-0 ${isDarkMode ? 
+        'bg-gray-900 bg-opacity-40' : 
+        'bg-white bg-opacity-40'} backdrop-blur-sm z-0`}></div>
 
       {/* Drag indicator for mobile */}
       {isMobile && (
         <div className="absolute top-2 left-0 right-0 flex justify-center z-30 pointer-events-none">
-          <div className="w-12 h-1 bg-gray-400 rounded-full opacity-70"></div>
+          <div className={`w-12 h-1 ${isDarkMode ? 'bg-gray-600' : 'bg-gray-400'} rounded-full opacity-70`}></div>
         </div>
       )}
 
@@ -231,14 +239,16 @@ const DashBody = ({ activePage, setActivePage, roomId }) => {
             {/* Left navigation button */}
             <motion.button
               onClick={() => handlePageChange("prev")}
-              className="absolute left-0 top-1/2 z-20 transform -translate-y-1/2 bg-white bg-opacity-70 hover:bg-opacity-90 p-4 pl-2 pr-3 rounded-r-xl shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className={`absolute left-0 top-1/2 z-20 transform -translate-y-1/2 ${isDarkMode ? 
+                'bg-gray-800 bg-opacity-70 hover:bg-opacity-90' : 
+                'bg-white bg-opacity-70 hover:bg-opacity-90'} p-4 pl-2 pr-3 rounded-r-xl shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-indigo-400`}
               whileHover={{ x: 5, boxShadow: "0 10px 25px rgba(0, 0, 0, 0.1)" }}
               whileTap={{ scale: 0.95 }}
               aria-label={`Go to ${pageStack[prevPageIndex].label}`}
             >
               <div className="flex flex-col items-center">
-                <ChevronLeft size={24} className="text-gray-700" />
-                <span className="text-xs font-medium text-gray-600 mt-1">
+                <ChevronLeft size={24} className={isDarkMode ? "text-gray-300" : "text-gray-700"} />
+                <span className={`text-xs font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
                   {pageStack[prevPageIndex].label}
                 </span>
               </div>
@@ -247,14 +257,16 @@ const DashBody = ({ activePage, setActivePage, roomId }) => {
             {/* Right navigation button */}
             <motion.button
               onClick={() => handlePageChange("next")}
-              className="absolute right-0 top-1/2 z-20 transform -translate-y-1/2 bg-white bg-opacity-70 hover:bg-opacity-90 p-4 pr-2 pl-3 rounded-l-xl shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className={`absolute right-0 top-1/2 z-20 transform -translate-y-1/2 ${isDarkMode ? 
+                'bg-gray-800 bg-opacity-70 hover:bg-opacity-90' : 
+                'bg-white bg-opacity-70 hover:bg-opacity-90'} p-4 pr-2 pl-3 rounded-l-xl shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-indigo-400`}
               whileHover={{ x: -5, boxShadow: "0 10px 25px rgba(0, 0, 0, 0.1)" }}
               whileTap={{ scale: 0.95 }}
               aria-label={`Go to ${pageStack[nextPageIndex].label}`}
             >
               <div className="flex flex-col items-center">
-                <ChevronRight size={24} className="text-gray-700" />
-                <span className="text-xs font-medium text-gray-600 mt-1">
+                <ChevronRight size={24} className={isDarkMode ? "text-gray-300" : "text-gray-700"} />
+                <span className={`text-xs font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
                   {pageStack[nextPageIndex].label}
                 </span>
               </div>
@@ -269,11 +281,11 @@ const DashBody = ({ activePage, setActivePage, roomId }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: dragPosition > 50 ? 0.8 : 0 }}
           >
-            <ChevronUp size={32} className="text-indigo-600" />
-            <span className="text-indigo-700 font-medium">
+            <ChevronUp size={32} className="text-indigo-500" />
+            <span className={`${isDarkMode ? 'text-indigo-400' : 'text-indigo-700'} font-medium`}>
               {dragPosition > 100 ? "Release to expand" : "Drag to expand"}
             </span>
-            <ChevronDown size={32} className="text-indigo-600" />
+            <ChevronDown size={32} className="text-indigo-500" />
           </motion.div>
         )}
 
@@ -301,9 +313,9 @@ const DashBody = ({ activePage, setActivePage, roomId }) => {
               }}
             >
               <div
-                className={`h-full w-full overflow-hidden ${
-                  expandView ? "rounded-none" : "rounded-t-3xl sm:rounded-t-4xl"
-                } bg-white bg-opacity-80 backdrop-blur-md`}
+                className={`h-full w-full overflow-hidden ${isDarkMode ? 
+                  'bg-gray-800 bg-opacity-80' : 
+                  'bg-white bg-opacity-80'} backdrop-blur-md`}
               >
                 {page.id === "collaborate" ? (
                   <PageComponent roomId={roomId} />
@@ -331,7 +343,7 @@ const DashBody = ({ activePage, setActivePage, roomId }) => {
         {/* Drag handle above mobile nav */}
         {isMobile && (
           <motion.div 
-            className="w-10 h-1 bg-gray-300 rounded-full mb-2 cursor-grab active:cursor-grabbing"
+            className={`w-10 h-1 ${isDarkMode ? 'bg-gray-600' : 'bg-gray-300'} rounded-full mb-2 cursor-grab active:cursor-grabbing`}
             whileHover={{ backgroundColor: "#6366F1", width: 40 }}
           />
         )}
@@ -347,7 +359,7 @@ const DashBody = ({ activePage, setActivePage, roomId }) => {
                 setActivePage(page.id);
               }}
               className={`h-2 rounded-full transition-all focus:outline-none ${
-                page.active ? "bg-indigo-600" : "bg-gray-400 hover:bg-gray-600"
+                page.active ? "bg-indigo-600" : `${isDarkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-400 hover:bg-gray-600'}`
               }`}
               animate={{ width: page.active ? 24 : 8 }}
               whileHover={{ scale: 1.2 }}
@@ -359,10 +371,14 @@ const DashBody = ({ activePage, setActivePage, roomId }) => {
 
         {/* Mobile navigation buttons */}
         {isMobile && (
-          <div className="flex items-center bg-indigo-600 bg-opacity-90 backdrop-blur-md rounded-full shadow-lg p-1">
+          <div className={`flex items-center ${isDarkMode ? 
+            'bg-indigo-800' : 
+            'bg-indigo-600'} bg-opacity-90 backdrop-blur-md rounded-full shadow-lg p-1`}>
             <motion.button
               onClick={() => handlePageChange("prev")}
-              className="p-3 rounded-l-full hover:bg-indigo-700 transition-all focus:outline-none focus:ring-2 focus:ring-white"
+              className={`p-3 rounded-l-full ${isDarkMode ? 
+                'hover:bg-indigo-900' : 
+                'hover:bg-indigo-700'} transition-all focus:outline-none focus:ring-2 focus:ring-white`}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               aria-label={`Go to ${pageStack[prevPageIndex].label}`}
@@ -376,7 +392,9 @@ const DashBody = ({ activePage, setActivePage, roomId }) => {
 
             <motion.button
               onClick={() => handlePageChange("next")}
-              className="p-3 rounded-r-full hover:bg-indigo-700 transition-all focus:outline-none focus:ring-2 focus:ring-white"
+              className={`p-3 rounded-r-full ${isDarkMode ? 
+                'hover:bg-indigo-900' : 
+                'hover:bg-indigo-700'} transition-all focus:outline-none focus:ring-2 focus:ring-white`}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               aria-label={`Go to ${pageStack[nextPageIndex].label}`}
@@ -389,7 +407,9 @@ const DashBody = ({ activePage, setActivePage, roomId }) => {
 
       {/* Initial guidance - shows on first render */}
       <motion.div
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 text-gray-500 pointer-events-none"
+        className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 ${isDarkMode ? 
+          'text-gray-400' : 
+          'text-gray-500'} pointer-events-none`}
         initial={{ opacity: 0.7 }}
         animate={{ opacity: 0 }}
         transition={{ delay: 1, duration: 2 }}
