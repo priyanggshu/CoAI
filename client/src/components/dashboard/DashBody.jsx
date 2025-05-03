@@ -170,38 +170,6 @@ const DashBody = ({ activePage, setActivePage, roomId }) => {
     return "behind";
   };
 
-  // Handle vertical drag for mobile
-  const handleVerticalDrag = (_, info) => {
-    setIsDragging(true);
-    setDragPosition(info.offset.y);
-    
-    // Ensure the drag stays within bounds
-    const maxDrag = 200; // Maximum amount the component can be dragged down
-    if (info.offset.y > maxDrag) {
-      controls.start({ y: maxDrag });
-    } else if (info.offset.y < 0) {
-      controls.start({ y: 0 });
-    } else {
-      controls.start({ y: info.offset.y });
-    }
-  };
-
-  const handleDragEnd = (_, info) => {
-    setIsDragging(false);
-    
-    // If dragged down significantly, expand the view
-    // Otherwise, snap back to original position
-    if (info.offset.y > 100) {
-      setExpandView(true);
-      controls.start({ y: 0 });
-    } else {
-      setExpandView(false);
-      controls.start({ y: 0, transition: { type: "spring", stiffness: 400, damping: 40 } });
-    }
-    
-    setDragPosition(0);
-  };
-
   const activeIndex = pageStack.findIndex(page => page.active);
   const prevPageIndex = (activeIndex - 1 + pageStack.length) % pageStack.length;
   const nextPageIndex = (activeIndex + 1) % pageStack.length;
@@ -212,12 +180,6 @@ const DashBody = ({ activePage, setActivePage, roomId }) => {
         'bg-gradient-to-b from-gray-900 to-gray-800' : 
         'bg-gradient-to-b from-gray-100 to-gray-200'} overflow-hidden h-screen shadow-xl`}
       animate={controls}
-      dragControls={dragControls}
-      drag={isMobile ? "y" : false}
-      dragConstraints={{ top: 0, bottom: 200 }}
-      dragElastic={0.2}
-      onDrag={handleVerticalDrag}
-      onDragEnd={handleDragEnd}
       style={{ touchAction: isMobile ? "pan-y" : "auto" }}
     >
       <div className={`absolute inset-0 ${isDarkMode ? 

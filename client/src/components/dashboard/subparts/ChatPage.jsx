@@ -327,7 +327,7 @@ const ChatPage = () => {
     >
       {/* Chat header with model selector */}
       <div
-        className={`relative px-3 sm:px-4 mx-auto transition-all duration-500 ${
+        className={`relative px-3 sm:px-4 mt-4 mx-auto transition-all duration-500 ${
           fullWidth ? "w-full max-w-6xl" : "w-full max-w-5xl"
         }`}
       >
@@ -654,7 +654,7 @@ const ChatPage = () => {
         {/* Chat messages area */}
         <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 sm:pr-2">
           <motion.div
-            className="space-y-6 sm:space-y-8 pb-4 pt-2"
+            className="space-y-6 sm:space-y-8 pb-4 pt-32"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -667,7 +667,7 @@ const ChatPage = () => {
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
                 <motion.div
-                  className={`bg-gradient-to-br ${selectedService.gradient} text-white p-4 sm:p-6 rounded-full mb-4 sm:mb-6 shadow-lg`}
+                  className={`bg-gradient-to-br ${selectedService.gradient} text-white p-6 sm:p-8 rounded-full mb-4 sm:mb-6 shadow-lg`}
                   animate={{
                     y: [0, -10, 0],
                     boxShadow: [
@@ -683,7 +683,7 @@ const ChatPage = () => {
                   }}
                 >
                   {React.createElement(selectedService.icon, {
-                    className: "size-8 sm:size-12",
+                    className: "size-12 sm:size-12",
                   })}
                 </motion.div>
                 <h3 className={`text-xl sm:text-2xl font-Montserrat font-semibold mb-2 sm:mb-3 text-center ${
