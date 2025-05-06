@@ -380,7 +380,7 @@ const ChatPage = () => {
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   className={`absolute left-0 mt-2 w-64 rounded-xl ${isDarkMode 
                     ? 'bg-gray-800/90 border-gray-700' 
-                    : 'bg-white/90 border-white'} backdrop-blur-sm shadow-lg z-10 border overflow-hidden`}
+                    : 'bg-gray-300 border-stone-400/60'} backdrop-blur-sm shadow-lg z-10 border overflow-hidden`}
                 >
                   <div className="p-2">
                     {aiServices.map((service) => {
@@ -403,7 +403,7 @@ const ChatPage = () => {
                               ? `bg-gradient-to-r ${service.gradient} text-white`
                               : isDarkMode 
                                 ? "hover:bg-gray-700" 
-                                : "hover:bg-gray-100"
+                                : "hover:bg-gray-100 text-gray-600"
                           }`}
                           whileHover={{ x: 4 }}
                           whileTap={{ scale: 0.98 }}

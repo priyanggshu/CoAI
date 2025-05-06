@@ -147,8 +147,8 @@ export const queryNvidia = async (prompt) => {
     const response = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
-        model: "nvidia/llama-3.3-nemotron-super-49b-v1:free",
-        messages: [{ role: "user", content: prompt }],
+        model: "nvidia/llama-3.1-nemotron-ultra-253b-v1:free",
+        messages: [{ role: "user", content: `Please respond concisely. ${prompt}` }],
       },
       {
         headers: {
