@@ -23,7 +23,12 @@ dotenv.config();
 const server = express();
 
 // Middleware setup
-server.use(cors());
+server.use(
+  cors({
+    origin: "https://coaii.netlify.app",
+    credentials: true,
+  })
+);
 server.use(morgan("dev"));
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
@@ -41,7 +46,11 @@ server.use(
 
 const httpServer = createServer(server);
 const io = new SocketServer(httpServer, {
-  cors: { origin: "*" }
+  cors: {
+    origin: "https://coaii.netlify.app",
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
 });
 
 server.use(passport.initialize());
